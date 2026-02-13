@@ -7,22 +7,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root{
-  --primary:#2563eb;     /* azul */
-  --bg:#05070c;          /* preto */
+  --primary:#2563eb;
+  --primary-600:#1d4ed8;
+  --bg:#05070c;
   --card:#0b1220;
   --border:rgba(255,255,255,.08);
-  --text:#ffffff;       /* branco */
+  --text:#ffffff;
   --muted:#94a3b8;
-  --danger:#dc2626;     /* vermelho */
+  --danger:#dc2626;
+  --success:#16a34a;
 
   --topbar-h:56px;
   --navbar-h:68px;
+  --radius:18px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;font-family:Inter}
@@ -31,24 +34,31 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);overflow
 /* LOGIN */
 #loginWrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 .login-card{
-  width:92%;max-width:420px;background:var(--card);border:1px solid var(--border);
-  border-radius:20px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.6)
+  width:92%;max-width:420px;background:linear-gradient(180deg,#0b1220,#020617);
+  border:1px solid var(--border);border-radius:24px;padding:28px;
+  box-shadow:0 20px 60px rgba(0,0,0,.65)
 }
-.login-card h1{font-size:22px;font-weight:900;margin-bottom:6px}
+.login-card h1{font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:.5px}
 .login-card p{font-size:13px;color:var(--muted);margin-bottom:18px}
+
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .field label{font-size:12px;color:var(--muted)}
 .field input{
   background:#020617;border:1px solid var(--border);border-radius:12px;
-  padding:12px;color:#fff;font-size:14px;outline:none
+  padding:12px 14px;color:#fff;font-size:14px;outline:none;
 }
+.field input:focus{border-color:rgba(37,99,235,.6);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+
 .btn{
   width:100%;padding:14px;border:none;border-radius:999px;
   background:linear-gradient(135deg,#2563eb,#1d4ed8);
-  color:#fff;font-weight:900;margin-top:10px;cursor:pointer
+  color:#fff;font-weight:900;margin-top:10px;cursor:pointer;
+  transition:.2s transform,.2s filter
 }
+.btn:active{transform:translateY(1px);filter:brightness(.95)}
+
 .error{
-  display:none;margin-top:10px;padding:10px;border-radius:12px;
+  display:none;margin-top:10px;padding:10px 12px;border-radius:12px;
   background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.4);
   color:#fecaca;font-size:12px
 }
@@ -60,8 +70,16 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);overflow
   background:#020617;border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:10
 }
-.topbar h1{font-size:16px;font-weight:900}
-.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center;font-weight:900}
+.topbar .left{display:flex;align-items:center;gap:10px}
+.topbar h1{font-size:15px;font-weight:900;letter-spacing:.4px}
+.badge{font-size:11px;color:#93c5fd;border:1px solid rgba(59,130,246,.35);padding:4px 8px;border-radius:999px}
+
+.avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#2563eb,#60a5fa);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;cursor:pointer;user-select:none
+}
 
 .content{
   position:fixed;top:var(--topbar-h);bottom:var(--navbar-h);left:0;right:0;
@@ -74,7 +92,10 @@ iframe{width:100%;height:100%;border:none;background:#020617}
   background:#020617;border-top:1px solid var(--border);
   display:flex;justify-content:space-around;align-items:center;z-index:10
 }
-.nav-item{font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.nav-item{
+  font-size:11px;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer
+}
 .nav-item i{font-size:22px}
 .nav-item.active{color:var(--primary)}
 </style>
@@ -90,12 +111,12 @@ iframe{width:100%;height:100%;border:none;background:#020617}
 
     <div class="field">
       <label>Email</label>
-      <input id="email" type="email">
+      <input id="email" type="email" placeholder="seu@email.com">
     </div>
 
     <div class="field">
       <label>Senha</label>
-      <input id="senha" type="password">
+      <input id="senha" type="password" placeholder="••••••••">
     </div>
 
     <button class="btn" onclick="login()">Entrar</button>
@@ -106,15 +127,19 @@ iframe{width:100%;height:100%;border:none;background:#020617}
 <!-- APP -->
 <div id="appRoot">
   <div class="topbar">
-    <h1>TURBO PDV</h1>
-    <div class="avatar" id="avatar">A</div>
+    <div class="left">
+      <h1>TURBO PDV</h1>
+      <span class="badge" id="userEmail">—</span>
+    </div>
+    <div class="avatar" id="avatar" title="Sair" onclick="logout()">A</div>
   </div>
 
   <div class="content">
+    <!-- ⚠️ Ajuste os caminhos conforme seu repositório -->
     <iframe id="frame-home" src="home.html"></iframe>
-    <iframe id="frame-caixa" src="pdv.html" style="display:none"></iframe>
-    <iframe id="frame-produtos" src="produtos.html" style="display:none"></iframe>
-    <iframe id="frame-relatorios" src="relatorios.html" style="display:none"></iframe>
+    <iframe id="frame-caixa" src="pages/pdv.html" style="display:none"></iframe>
+    <iframe id="frame-produtos" src="pages/produtos.html" style="display:none"></iframe>
+    <iframe id="frame-relatorios" src="pages/relatorios.html" style="display:none"></iframe>
   </div>
 
   <nav class="navbar">
@@ -137,6 +162,12 @@ iframe{width:100%;height:100%;border:none;background:#020617}
     const erro = document.getElementById("erro");
     erro.style.display="none";
 
+    if(!email || !senha){
+      erro.innerText = "Preencha email e senha";
+      erro.style.display="block";
+      return;
+    }
+
     const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
 
     if(error){
@@ -145,7 +176,6 @@ iframe{width:100%;height:100%;border:none;background:#020617}
       return;
     }
 
-    localStorage.setItem("pdv_session", JSON.stringify(data.session));
     abrirApp(data.user);
   }
 
@@ -153,6 +183,7 @@ iframe{width:100%;height:100%;border:none;background:#020617}
     document.getElementById("loginWrap").style.display="none";
     document.getElementById("appRoot").style.display="block";
     document.getElementById("avatar").innerText = (user.email || "A")[0].toUpperCase();
+    document.getElementById("userEmail").innerText = user.email || "—";
   }
 
   function go(el, key){
@@ -160,8 +191,15 @@ iframe{width:100%;height:100%;border:none;background:#020617}
     el.classList.add("active");
 
     ["home","caixa","produtos","relatorios"].forEach(k=>{
-      document.getElementById("frame-"+k).style.display = (k===key?"block":"none");
+      const f = document.getElementById("frame-"+k);
+      if(!f) return;
+      f.style.display = (k===key ? "block" : "none");
     });
+  }
+
+  async function logout(){
+    await sb.auth.signOut();
+    location.reload();
   }
 
   // auto-login se já tiver sessão
