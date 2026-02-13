@@ -7,135 +7,68 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root{
   --primary:#2563eb;
-  --primary-600:#1d4ed8;
   --bg:#05070c;
   --card:#0b1220;
   --border:rgba(255,255,255,.08);
   --text:#ffffff;
   --muted:#94a3b8;
   --danger:#dc2626;
-  --success:#16a34a;
-
   --topbar-h:56px;
   --navbar-h:68px;
-  --radius:18px;
 }
-
 *{box-sizing:border-box;margin:0;padding:0;font-family:Inter}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--text);overflow:hidden}
-
-/* LOGIN */
 #loginWrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-.login-card{
-  width:92%;max-width:420px;background:linear-gradient(180deg,#0b1220,#020617);
-  border:1px solid var(--border);border-radius:24px;padding:28px;
-  box-shadow:0 20px 60px rgba(0,0,0,.65)
-}
-.login-card h1{font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:.5px}
-.login-card p{font-size:13px;color:var(--muted);margin-bottom:18px}
-
+.login-card{width:92%;max-width:420px;background:#0b1220;border:1px solid var(--border);border-radius:22px;padding:28px}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .field label{font-size:12px;color:var(--muted)}
-.field input{
-  background:#020617;border:1px solid var(--border);border-radius:12px;
-  padding:12px 14px;color:#fff;font-size:14px;outline:none;
-}
-.field input:focus{border-color:rgba(37,99,235,.6);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.field input{background:#020617;border:1px solid var(--border);border-radius:12px;padding:12px;color:#fff}
+.btn{width:100%;padding:14px;border:none;border-radius:999px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-weight:900;cursor:pointer}
+.error{display:none;margin-top:10px;padding:10px;border-radius:12px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.4);color:#fecaca;font-size:12px}
 
-.btn{
-  width:100%;padding:14px;border:none;border-radius:999px;
-  background:linear-gradient(135deg,#2563eb,#1d4ed8);
-  color:#fff;font-weight:900;margin-top:10px;cursor:pointer;
-  transition:.2s transform,.2s filter
-}
-.btn:active{transform:translateY(1px);filter:brightness(.95)}
-
-.error{
-  display:none;margin-top:10px;padding:10px 12px;border-radius:12px;
-  background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.4);
-  color:#fecaca;font-size:12px
-}
-
-/* APP */
 #appRoot{display:none;height:100%}
-.topbar{
-  position:fixed;top:0;left:0;right:0;height:var(--topbar-h);
-  background:#020617;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:10
-}
-.topbar .left{display:flex;align-items:center;gap:10px}
-.topbar h1{font-size:15px;font-weight:900;letter-spacing:.4px}
-.badge{font-size:11px;color:#93c5fd;border:1px solid rgba(59,130,246,.35);padding:4px 8px;border-radius:999px}
-
-.avatar{
-  width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(135deg,#2563eb,#60a5fa);
-  display:flex;align-items:center;justify-content:center;
-  font-weight:900;cursor:pointer;user-select:none
-}
-
-.content{
-  position:fixed;top:var(--topbar-h);bottom:var(--navbar-h);left:0;right:0;
-  background:#020617
-}
-iframe{width:100%;height:100%;border:none;background:#020617}
-
-.navbar{
-  position:fixed;bottom:0;left:0;right:0;height:var(--navbar-h);
-  background:#020617;border-top:1px solid var(--border);
-  display:flex;justify-content:space-around;align-items:center;z-index:10
-}
-.nav-item{
-  font-size:11px;color:var(--muted);
-  display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer
-}
-.nav-item i{font-size:22px}
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);background:#020617;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:10}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center;font-weight:900;cursor:pointer}
+.content{position:fixed;top:var(--topbar-h);bottom:var(--navbar-h);left:0;right:0;background:#020617}
+iframe{width:100%;height:100%;border:none}
+.navbar{position:fixed;bottom:0;left:0;right:0;height:var(--navbar-h);background:#020617;border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center}
+.nav-item{font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .nav-item.active{color:var(--primary)}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div id="loginWrap">
   <div class="login-card">
     <h1>Turbo PDV</h1>
-    <p>Faça login para acessar o painel</p>
-
     <div class="field">
       <label>Email</label>
-      <input id="email" type="email" placeholder="seu@email.com">
+      <input id="email" type="email">
     </div>
-
     <div class="field">
       <label>Senha</label>
-      <input id="senha" type="password" placeholder="••••••••">
+      <input id="senha" type="password">
     </div>
-
     <button class="btn" onclick="login()">Entrar</button>
     <div id="erro" class="error"></div>
   </div>
 </div>
 
-<!-- APP -->
 <div id="appRoot">
   <div class="topbar">
-    <div class="left">
-      <h1>TURBO PDV</h1>
-      <span class="badge" id="userEmail">—</span>
-    </div>
-    <div class="avatar" id="avatar" title="Sair" onclick="logout()">A</div>
+    <h1>TURBO PDV</h1>
+    <div class="avatar" id="avatar" onclick="logout()">A</div>
   </div>
 
   <div class="content">
-    <!-- ⚠️ Ajuste os caminhos conforme seu repositório -->
     <iframe id="frame-home" src="home.html"></iframe>
     <iframe id="frame-caixa" src="pages/pdv.html" style="display:none"></iframe>
     <iframe id="frame-produtos" src="pages/produtos.html" style="display:none"></iframe>
@@ -151,62 +84,61 @@ iframe{width:100%;height:100%;border:none;background:#020617}
 </div>
 
 <script>
-  const sb = supabase.createClient(
-    "https://xysjlpsxgjwmhedkdgpd.supabase.co",
-    "sb_publishable_sjYPsNM9PBGvsvJTQEnz_w_k6SdvNHN"
-  );
+const sb = supabase.createClient(
+  "https://xysjlpsxgjwmhedkdgpd.supabase.co",
+  "sb_publishable_sjYPsNM9PBGvsvJTQEnz_w_k6SdvNHN"
+);
 
-  async function login(){
-    const email = document.getElementById("email").value.trim();
-    const senha = document.getElementById("senha").value.trim();
-    const erro = document.getElementById("erro");
-    erro.style.display="none";
+async function login(){
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value.trim();
+  const erro = document.getElementById("erro");
+  erro.style.display="none";
 
-    if(!email || !senha){
-      erro.innerText = "Preencha email e senha";
-      erro.style.display="block";
-      return;
-    }
+  const { data, error } = await sb
+    .from("usuarios_pdv")
+    .select("id,nome,email,role")
+    .eq("email", email)
+    .eq("senha", senha)
+    .eq("ativo", true)
+    .single();
 
-    const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
-
-    if(error){
-      erro.innerText = "Login inválido";
-      erro.style.display="block";
-      return;
-    }
-
-    abrirApp(data.user);
+  if(error || !data){
+    erro.innerText = "Usuário ou senha inválidos";
+    erro.style.display = "block";
+    return;
   }
 
-  function abrirApp(user){
-    document.getElementById("loginWrap").style.display="none";
-    document.getElementById("appRoot").style.display="block";
-    document.getElementById("avatar").innerText = (user.email || "A")[0].toUpperCase();
-    document.getElementById("userEmail").innerText = user.email || "—";
-  }
+  localStorage.setItem("pdv_user", JSON.stringify(data));
+  abrirApp(data);
+}
 
-  function go(el, key){
-    document.querySelectorAll(".nav-item").forEach(i=>i.classList.remove("active"));
-    el.classList.add("active");
+function abrirApp(user){
+  document.getElementById("loginWrap").style.display="none";
+  document.getElementById("appRoot").style.display="block";
+  document.getElementById("avatar").innerText = (user.nome || "A")[0].toUpperCase();
+}
 
-    ["home","caixa","produtos","relatorios"].forEach(k=>{
-      const f = document.getElementById("frame-"+k);
-      if(!f) return;
-      f.style.display = (k===key ? "block" : "none");
-    });
-  }
+function go(el, key){
+  document.querySelectorAll(".nav-item").forEach(i=>i.classList.remove("active"));
+  el.classList.add("active");
+  ["home","caixa","produtos","relatorios"].forEach(k=>{
+    const f = document.getElementById("frame-"+k);
+    if(!f) return;
+    f.style.display = (k===key?"block":"none");
+  });
+}
 
-  async function logout(){
-    await sb.auth.signOut();
-    location.reload();
-  }
+function logout(){
+  localStorage.removeItem("pdv_user");
+  location.reload();
+}
 
-  // auto-login se já tiver sessão
-  (async ()=>{
-    const { data:{session} } = await sb.auth.getSession();
-    if(session) abrirApp(session.user);
-  })();
+// auto-login
+(function(){
+  const u = localStorage.getItem("pdv_user");
+  if(u) abrirApp(JSON.parse(u));
+})();
 </script>
 
 </body>
