@@ -3,116 +3,255 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#020617" />
-<title>PDV Turbo • Dashboard</title>
+<meta name="theme-color" content="#ff6a00" />
+<title>PDV Bebidas • Controle Premium</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root{
   --primary:#ff6a00;
-  --bg:#020617;
-  --card:#0b1220;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-  --radius:18px;
+  --bg:#f4f6fb;
+  --card:#ffffff;
+  --border:#e5e7eb;
+  --text:#0f172a;
+  --muted:#64748b;
+  --radius:22px;
+  --shadow:0 14px 40px rgba(0,0,0,.12);
 }
-*{box-sizing:border-box;font-family:Inter}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  height:100vh;
-  display:flex;
-  flex-direction:column;
+*{box-sizing:border-box;font-family:Inter,system-ui}
+body{margin:0;background:var(--bg);color:var(--text)}
+header{
+  position:sticky;top:0;z-index:10;
+  background:#0f172a;color:#fff;
+  padding:14px 20px;
+  display:flex;align-items:center;gap:10px;
+  font-weight:900
 }
-.header{
-  height:56px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 16px;
-  border-bottom:1px solid rgba(255,255,255,.06);
+main{max-width:1400px;margin:auto;padding:20px;display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  border:1px solid var(--border);
+  padding:18px
 }
-.header h2{
-  margin:0;
-  font-size:18px;
-}
-.main{
-  flex:1;
-  position:relative;
-}
-iframe{
-  width:100%;
-  height:100%;
-  border:none;
-  background:#020617;
-}
-.navbar{
-  height:74px;
-  background:#020617;
-  border-top:1px solid rgba(255,255,255,.08);
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-}
-.navbar button{
-  background:none;
-  border:none;
-  color:var(--muted);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:4px;
-  font-size:11px;
-  font-weight:700;
+h2{margin:0 0 12px 0}
+.lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.produto{
+  padding:14px;
+  border-radius:16px;
+  border:1px solid var(--border);
   cursor:pointer;
+  transition:.2s;
+  background:#fff
 }
-.navbar button i{
-  font-size:22px;
+.produto:hover{transform:translateY(-4px);border-color:var(--primary)}
+.produto strong{display:block;font-size:14px}
+.preco{font-weight:900;color:var(--primary)}
+.carrinho{display:flex;flex-direction:column;gap:10px}
+.item{
+  display:grid;
+  grid-template-columns:1fr 70px 90px 34px;
+  gap:8px;
+  align-items:center;
+  border-bottom:1px dashed var(--border);
+  padding-bottom:8px
 }
-.navbar button.active{
+.item input{padding:6px;border-radius:8px;border:1px solid var(--border)}
+.total{font-size:28px;font-weight:900;color:var(--primary)}
+select,button,input{
+  padding:12px;border-radius:12px;border:1px solid var(--border)
+}
+button{
+  background:var(--primary);
   color:#fff;
+  font-weight:900;
+  cursor:pointer;border:none
 }
-.navbar button.active i{
-  color:var(--primary);
+button.secondary{
+  background:#0f172a
 }
+button.danger{
+  background:#dc2626
+}
+.footer-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.relatorio{
+  max-height:420px;
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:14px
+}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px;border-bottom:1px solid var(--border);text-align:left}
+th{background:#f8fafc;position:sticky;top:0}
 </style>
 </head>
-
 <body>
 
-<header class="header">
-  <h2 id="titulo">Comandas</h2>
+<header>
+  <i class="ri-beer-line"></i> PDV Bebidas • Controle de Vendas
 </header>
 
-<main class="main">
-  <iframe id="frame" src="comandas.html"></iframe>
+<main>
+
+  <!-- PRODUTOS -->
+  <div class="card">
+    <h2>🍻 Bebidas</h2>
+    <div class="lista" id="produtos"></div>
+  </div>
+
+  <!-- PDV -->
+  <div class="card">
+    <h2>🧾 Venda Atual</h2>
+    <div class="carrinho" id="carrinho"></div>
+
+    <label>Forma de Pagamento</label>
+    <select id="pagamento">
+      <option value="PIX">PIX</option>
+      <option value="Cartão Crédito">Cartão Crédito</option>
+      <option value="Cartão Débito">Cartão Débito</option>
+      <option value="Dinheiro">Dinheiro</option>
+    </select>
+
+    <div class="total">Total: R$ <span id="total">0.00</span></div>
+
+    <div class="footer-actions">
+      <button onclick="finalizarVenda()">Finalizar Venda</button>
+      <button class="secondary" onclick="limparCarrinho()">Limpar</button>
+    </div>
+
+    <h2 style="margin-top:20px">📊 Vendas do Dia</h2>
+    <div class="relatorio">
+      <table>
+        <thead>
+          <tr>
+            <th>Hora</th>
+            <th>Item</th>
+            <th>Qtd</th>
+            <th>Forma</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="listaVendas"></tbody>
+      </table>
+    </div>
+
+    <div class="total" style="margin-top:10px">
+      Caixa Hoje: R$ <span id="totalDia">0.00</span>
+    </div>
+  </div>
+
 </main>
 
-<nav class="navbar">
-  <button class="active" onclick="go('comandas.html','Comandas',this)">
-    <i class="ri-file-list-3-line"></i>
-    Comandas
-  </button>
-  <button onclick="go('contas.html','Contas a pagar',this)">
-    <i class="ri-bank-card-line"></i>
-    Contas
-  </button>
-  <button onclick="go('investimentos.html','Investimentos',this)">
-    <i class="ri-line-chart-line"></i>
-    Invest
-  </button>
-</nav>
-
 <script>
-function go(src, title, btn){
-  document.getElementById("frame").src = src;
-  document.getElementById("titulo").innerText = title;
-  document.querySelectorAll(".navbar button").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
+const supabase = window.supabase.createClient(
+  "https://jpbmilzeydcovghkrtfp.supabase.co",
+  "sb_publishable_H_F8x9-SerZW41cWUBdy6g_Ksb-XugW"
+);
+
+let produtos = [];
+let carrinho = [];
+
+async function carregarProdutos(){
+  const { data, error } = await supabase
+    .from("produtos_turbo")
+    .select("id, nome, preco_venda")
+    .eq("ativo", true)
+    .order("nome");
+
+  if(error){ alert("Erro ao carregar produtos"); return; }
+
+  produtos = data;
+  document.getElementById("produtos").innerHTML = data.map(p => `
+    <div class="produto" onclick='add("${p.id}")'>
+      <strong>${p.nome}</strong>
+      <span class="preco">R$ ${Number(p.preco_venda).toFixed(2)}</span>
+    </div>
+  `).join("");
 }
+
+function add(id){
+  const p = produtos.find(x => x.id === id);
+  const ex = carrinho.find(x => x.id === id);
+  if(ex) ex.qtd++;
+  else carrinho.push({ ...p, qtd:1 });
+  renderCarrinho();
+}
+
+function renderCarrinho(){
+  let total = 0;
+  document.getElementById("carrinho").innerHTML = carrinho.map((i,idx)=>{
+    const sub = i.qtd * i.preco_venda;
+    total += sub;
+    return `
+      <div class="item">
+        <b>${i.nome}</b>
+        <input type="number" min="1" value="${i.qtd}" onchange="alt(${idx},this.value)">
+        <span>R$ ${sub.toFixed(2)}</span>
+        <i class="ri-delete-bin-line" style="cursor:pointer" onclick="rem(${idx})"></i>
+      </div>
+    `;
+  }).join("");
+  document.getElementById("total").innerText = total.toFixed(2);
+}
+
+function alt(i,v){ carrinho[i].qtd = Number(v); renderCarrinho(); }
+function rem(i){ carrinho.splice(i,1); renderCarrinho(); }
+function limparCarrinho(){ carrinho=[]; renderCarrinho(); }
+
+async function finalizarVenda(){
+  if(!carrinho.length) return alert("Carrinho vazio");
+
+  const forma = document.getElementById("pagamento").value;
+
+  for(const item of carrinho){
+    await supabase.from("vendas_bebidas").insert({
+      produto_id: item.id,
+      nome_produto: item.nome,
+      quantidade: item.qtd,
+      preco_unitario: item.preco_venda,
+      total: item.qtd * item.preco_venda,
+      forma_pagamento: forma
+    });
+  }
+
+  carrinho = [];
+  renderCarrinho();
+  carregarVendasHoje();
+  alert("Venda registrada com sucesso!");
+}
+
+async function carregarVendasHoje(){
+  const inicio = new Date(); inicio.setHours(0,0,0,0);
+
+  const { data } = await supabase
+    .from("vendas_bebidas")
+    .select("created_at,nome_produto,quantidade,forma_pagamento,total")
+    .gte("created_at", inicio.toISOString())
+    .order("created_at",{ascending:false});
+
+  let soma = 0;
+  document.getElementById("listaVendas").innerHTML = (data||[]).map(v=>{
+    soma += Number(v.total);
+    return `
+      <tr>
+        <td>${new Date(v.created_at).toLocaleTimeString()}</td>
+        <td>${v.nome_produto}</td>
+        <td>${v.quantidade}</td>
+        <td>${v.forma_pagamento}</td>
+        <td>R$ ${Number(v.total).toFixed(2)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  document.getElementById("totalDia").innerText = soma.toFixed(2);
+}
+
+carregarProdutos();
+carregarVendasHoje();
 </script>
 
 </body>
