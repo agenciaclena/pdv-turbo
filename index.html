@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ff6a00" />
-<title>PDV Bebidas • Controle Premium</title>
+<title>PDV Bebidas • Premium</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -13,86 +13,85 @@
 <style>
 :root{
   --primary:#ff6a00;
+  --dark:#0f172a;
   --bg:#f4f6fb;
   --card:#ffffff;
   --border:#e5e7eb;
-  --text:#0f172a;
   --muted:#64748b;
   --radius:22px;
   --shadow:0 14px 40px rgba(0,0,0,.12);
 }
 *{box-sizing:border-box;font-family:Inter,system-ui}
-body{margin:0;background:var(--bg);color:var(--text)}
+body{margin:0;background:var(--bg);color:#0f172a}
 header{
   position:sticky;top:0;z-index:10;
-  background:#0f172a;color:#fff;
-  padding:14px 20px;
+  background:var(--dark);color:#fff;
+  padding:14px 18px;
   display:flex;align-items:center;gap:10px;
   font-weight:900
 }
-main{max-width:1400px;margin:auto;padding:20px;display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+main{
+  max-width:1400px;margin:auto;padding:16px;
+  display:grid;grid-template-columns:1.4fr 1fr;gap:16px
+}
 .card{
   background:var(--card);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
   border:1px solid var(--border);
-  padding:18px
+  padding:14px
 }
-h2{margin:0 0 12px 0}
-.lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.produto{
-  padding:14px;
-  border-radius:16px;
-  border:1px solid var(--border);
-  cursor:pointer;
-  transition:.2s;
-  background:#fff
+h2{margin:0 0 10px 0}
+.search{
+  display:flex;gap:8px;margin-bottom:10px
 }
-.produto:hover{transform:translateY(-4px);border-color:var(--primary)}
-.produto strong{display:block;font-size:14px}
-.preco{font-weight:900;color:var(--primary)}
-.carrinho{display:flex;flex-direction:column;gap:10px}
-.item{
+.search input{
+  flex:1;padding:12px;border-radius:12px;border:1px solid var(--border)
+}
+.lista{
   display:grid;
-  grid-template-columns:1fr 70px 90px 34px;
-  gap:8px;
-  align-items:center;
-  border-bottom:1px dashed var(--border);
-  padding-bottom:8px
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:10px
+}
+.produto{
+  padding:12px;border-radius:14px;border:1px solid var(--border);
+  cursor:pointer;background:#fff;transition:.15s
+}
+.produto:hover{transform:translateY(-3px);border-color:var(--primary)}
+.produto strong{display:block;font-size:13px}
+.preco{color:var(--primary);font-weight:900}
+.carrinho{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
+.item{
+  display:grid;grid-template-columns:1fr 70px 90px 28px;gap:6px;align-items:center;
+  border-bottom:1px dashed var(--border);padding-bottom:6px
 }
 .item input{padding:6px;border-radius:8px;border:1px solid var(--border)}
-.total{font-size:28px;font-weight:900;color:var(--primary)}
-select,button,input{
-  padding:12px;border-radius:12px;border:1px solid var(--border)
+.totalBox{
+  background:linear-gradient(135deg,#ff6a00,#f97316);
+  color:#fff;border-radius:16px;padding:14px;margin:10px 0;
+  font-size:26px;font-weight:900;text-align:center
 }
-button{
-  background:var(--primary);
-  color:#fff;
-  font-weight:900;
-  cursor:pointer;border:none
+.pay-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:8px
 }
-button.secondary{
-  background:#0f172a
+.pay-btn{
+  padding:14px;border-radius:14px;border:none;
+  font-weight:900;cursor:pointer
 }
-button.danger{
-  background:#dc2626
+.pay-btn.pix{background:#16a34a;color:#fff}
+.pay-btn.credit{background:#2563eb;color:#fff}
+.pay-btn.debit{background:#0ea5e9;color:#fff}
+.pay-btn.cash{background:#0f172a;color:#fff}
+.actions{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px
 }
-.footer-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.relatorio{
-  max-height:420px;
-  overflow:auto;
-  border:1px solid var(--border);
-  border-radius:14px
-}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:8px;border-bottom:1px solid var(--border);text-align:left}
-th{background:#f8fafc;position:sticky;top:0}
+button{cursor:pointer}
 </style>
 </head>
 <body>
 
 <header>
-  <i class="ri-beer-line"></i> PDV Bebidas • Controle de Vendas
+  <i class="ri-beer-line"></i> PDV Bebidas • Premium
 </header>
 
 <main>
@@ -100,47 +99,33 @@ th{background:#f8fafc;position:sticky;top:0}
   <!-- PRODUTOS -->
   <div class="card">
     <h2>🍻 Bebidas</h2>
+    <div class="search">
+      <input id="busca" placeholder="Buscar bebida..." oninput="filtrarProdutos()" />
+    </div>
     <div class="lista" id="produtos"></div>
   </div>
 
-  <!-- PDV -->
+  <!-- CAIXA -->
   <div class="card">
-    <h2>🧾 Venda Atual</h2>
+    <h2>🧾 Caixa</h2>
+
     <div class="carrinho" id="carrinho"></div>
 
-    <label>Forma de Pagamento</label>
-    <select id="pagamento">
-      <option value="PIX">PIX</option>
-      <option value="Cartão Crédito">Cartão Crédito</option>
-      <option value="Cartão Débito">Cartão Débito</option>
-      <option value="Dinheiro">Dinheiro</option>
-    </select>
-
-    <div class="total">Total: R$ <span id="total">0.00</span></div>
-
-    <div class="footer-actions">
-      <button onclick="finalizarVenda()">Finalizar Venda</button>
-      <button class="secondary" onclick="limparCarrinho()">Limpar</button>
+    <div class="totalBox">
+      TOTAL: R$ <span id="total">0.00</span>
     </div>
 
-    <h2 style="margin-top:20px">📊 Vendas do Dia</h2>
-    <div class="relatorio">
-      <table>
-        <thead>
-          <tr>
-            <th>Hora</th>
-            <th>Item</th>
-            <th>Qtd</th>
-            <th>Forma</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody id="listaVendas"></tbody>
-      </table>
+    <h3>Forma de Pagamento</h3>
+    <div class="pay-grid">
+      <button class="pay-btn pix" onclick="finalizar('PIX')">PIX</button>
+      <button class="pay-btn credit" onclick="finalizar('Cartão Crédito')">Crédito</button>
+      <button class="pay-btn debit" onclick="finalizar('Cartão Débito')">Débito</button>
+      <button class="pay-btn cash" onclick="finalizar('Dinheiro')">Dinheiro</button>
     </div>
 
-    <div class="total" style="margin-top:10px">
-      Caixa Hoje: R$ <span id="totalDia">0.00</span>
+    <div class="actions">
+      <button onclick="limpar()" style="background:#e5e7eb;border:none;border-radius:12px;padding:12px">Limpar</button>
+      <button onclick="confirmar()" style="background:#dc2626;color:#fff;border:none;border-radius:12px;padding:12px">Confirmar Venda</button>
     </div>
   </div>
 
@@ -154,23 +139,30 @@ const supabase = window.supabase.createClient(
 
 let produtos = [];
 let carrinho = [];
+let formaSelecionada = null;
 
 async function carregarProdutos(){
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("produtos_turbo")
-    .select("id, nome, preco_venda")
+    .select("id,nome,preco_venda")
     .eq("ativo", true)
     .order("nome");
+  produtos = data || [];
+  renderProdutos(produtos);
+}
 
-  if(error){ alert("Erro ao carregar produtos"); return; }
-
-  produtos = data;
-  document.getElementById("produtos").innerHTML = data.map(p => `
-    <div class="produto" onclick='add("${p.id}")'>
+function renderProdutos(lista){
+  document.getElementById("produtos").innerHTML = lista.map(p => `
+    <div class="produto" onclick="add('${p.id}')">
       <strong>${p.nome}</strong>
       <span class="preco">R$ ${Number(p.preco_venda).toFixed(2)}</span>
     </div>
   `).join("");
+}
+
+function filtrarProdutos(){
+  const t = document.getElementById("busca").value.toLowerCase();
+  renderProdutos(produtos.filter(p => p.nome.toLowerCase().includes(t)));
 }
 
 function add(id){
@@ -191,7 +183,7 @@ function renderCarrinho(){
         <b>${i.nome}</b>
         <input type="number" min="1" value="${i.qtd}" onchange="alt(${idx},this.value)">
         <span>R$ ${sub.toFixed(2)}</span>
-        <i class="ri-delete-bin-line" style="cursor:pointer" onclick="rem(${idx})"></i>
+        <i class="ri-close-circle-line" onclick="rem(${idx})" style="cursor:pointer"></i>
       </div>
     `;
   }).join("");
@@ -200,12 +192,16 @@ function renderCarrinho(){
 
 function alt(i,v){ carrinho[i].qtd = Number(v); renderCarrinho(); }
 function rem(i){ carrinho.splice(i,1); renderCarrinho(); }
-function limparCarrinho(){ carrinho=[]; renderCarrinho(); }
+function limpar(){ carrinho=[]; formaSelecionada=null; renderCarrinho(); }
 
-async function finalizarVenda(){
+function finalizar(forma){
+  formaSelecionada = forma;
+  alert("Forma selecionada: " + forma + "\nClique em CONFIRMAR VENDA");
+}
+
+async function confirmar(){
   if(!carrinho.length) return alert("Carrinho vazio");
-
-  const forma = document.getElementById("pagamento").value;
+  if(!formaSelecionada) return alert("Escolha a forma de pagamento");
 
   for(const item of carrinho){
     await supabase.from("vendas_bebidas").insert({
@@ -214,44 +210,15 @@ async function finalizarVenda(){
       quantidade: item.qtd,
       preco_unitario: item.preco_venda,
       total: item.qtd * item.preco_venda,
-      forma_pagamento: forma
+      forma_pagamento: formaSelecionada
     });
   }
 
-  carrinho = [];
-  renderCarrinho();
-  carregarVendasHoje();
+  limpar();
   alert("Venda registrada com sucesso!");
 }
 
-async function carregarVendasHoje(){
-  const inicio = new Date(); inicio.setHours(0,0,0,0);
-
-  const { data } = await supabase
-    .from("vendas_bebidas")
-    .select("created_at,nome_produto,quantidade,forma_pagamento,total")
-    .gte("created_at", inicio.toISOString())
-    .order("created_at",{ascending:false});
-
-  let soma = 0;
-  document.getElementById("listaVendas").innerHTML = (data||[]).map(v=>{
-    soma += Number(v.total);
-    return `
-      <tr>
-        <td>${new Date(v.created_at).toLocaleTimeString()}</td>
-        <td>${v.nome_produto}</td>
-        <td>${v.quantidade}</td>
-        <td>${v.forma_pagamento}</td>
-        <td>R$ ${Number(v.total).toFixed(2)}</td>
-      </tr>
-    `;
-  }).join("");
-
-  document.getElementById("totalDia").innerText = soma.toFixed(2);
-}
-
 carregarProdutos();
-carregarVendasHoje();
 </script>
 
 </body>
