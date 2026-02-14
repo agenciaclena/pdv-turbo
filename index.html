@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#0f172a" />
-<title>PDV Bebidas • Turbo Premium</title>
+<title>PDV Bebidas • Turbo</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -12,50 +12,30 @@
 
 <style>
 :root{
-  --primary:#ff6a00;
-  --dark:#0f172a;
-  --bg:#0b1220;
-  --card:#0f172a;
-  --muted:#94a3b8;
-  --border:#1f2933;
-  --radius:18px;
-  --green:#22c55e;
+  --primary:#ff6a00; --dark:#0f172a; --bg:#020617; --card:#0b1220;
+  --border:#1f2933; --green:#22c55e; --muted:#94a3b8; --radius:18px;
 }
 *{box-sizing:border-box;font-family:Inter,system-ui}
 body{margin:0;background:radial-gradient(circle at top,#0f172a,#020617);color:#e5e7eb}
-header{position:sticky;top:0;z-index:30;background:rgba(2,6,23,.85);backdrop-filter:blur(8px);color:#fff;padding:14px 16px;font-weight:900}
+header{position:sticky;top:0;z-index:20;background:rgba(2,6,23,.85);backdrop-filter:blur(8px);padding:14px 16px;font-weight:900}
 main{padding:12px;display:grid;gap:12px}
-.section{background:rgba(15,23,42,.85);border:1px solid #1f2933;border-radius:18px;padding:12px}
+.section{background:#0b1220;border:1px solid #1f2933;border-radius:18px;padding:12px}
 .comandas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.comanda{
-  background:linear-gradient(145deg,#0b1220,#020617);
-  border:1px solid #1f2933;border-radius:14px;padding:12px;
-  text-align:center;font-weight:800;cursor:pointer;
-  transition:.15s;
-}
-.comanda.active{outline:2px solid var(--primary);box-shadow:0 0 0 2px rgba(255,106,0,.3)}
-.comanda.has-items{border-color:var(--green);background:linear-gradient(145deg,#052e1a,#020617)}
-.comanda .total{font-size:12px;color:#22c55e;margin-top:4px}
-
+.comanda{border:1px solid #1f2933;border-radius:14px;padding:12px;text-align:center;font-weight:800;cursor:pointer}
+.comanda.active{outline:2px solid var(--primary)}
+.comanda.has-items{border-color:var(--green)}
 .produtos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.produto{
-  background:linear-gradient(145deg,#0b1220,#020617);
-  border:1px solid #1f2933;border-radius:14px;padding:12px;
-  cursor:pointer;position:relative;transition:.12s;
-}
+.produto{border:1px solid #1f2933;border-radius:14px;padding:12px;cursor:pointer;position:relative}
 .produto.selected{outline:2px solid var(--primary)}
-.badge{position:absolute;top:-6px;right:-6px;background:var(--primary);color:#fff;border-radius:999px;padding:4px 8px;font-weight:900}
-
-.carrinho .item{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:6px 0;border-bottom:1px dashed #1f2933}
+.badge{position:absolute;top:-6px;right:-6px;background:var(--primary);border-radius:999px;padding:4px 8px;font-weight:900}
+.item{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:6px 0;border-bottom:1px dashed #1f2933}
 .qty{display:flex;gap:6px}
 .qty button{background:#020617;border:1px solid #1f2933;color:#fff;border-radius:8px;padding:4px 8px}
-
-.total{background:linear-gradient(135deg,#ff6a00,#f97316);border-radius:14px;padding:12px;text-align:center;font-size:22px;font-weight:900}
 .btn{padding:14px;border-radius:14px;border:none;font-weight:900;cursor:pointer}
 .btn.primary{background:var(--primary);color:#fff}
 .btn.gray{background:#1f2933;color:#fff}
 .btn.danger{background:#dc2626;color:#fff}
-
+.total{background:linear-gradient(135deg,#ff6a00,#f97316);border-radius:14px;padding:12px;text-align:center;font-size:22px;font-weight:900}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;z-index:50}
 .modal.show{display:flex}
 .modal .box{background:#020617;border-radius:22px 22px 0 0;padding:14px;width:100%;max-height:85vh;overflow:auto}
@@ -63,38 +43,44 @@ main{padding:12px;display:grid;gap:12px}
 </head>
 <body>
 
-<header>PDV Bebidas • Turbo Premium</header>
+<header>PDV Bebidas • Turbo</header>
 
 <main>
 
+  <!-- COMANDAS -->
   <div class="section">
     <h3>🧾 Comandas</h3>
     <div class="comandas" id="listaComandas"></div>
   </div>
 
+  <!-- PRODUTOS -->
   <div class="section">
     <h3>🍻 Produtos</h3>
     <div class="produtos" id="produtos"></div>
   </div>
 
+  <!-- CARRINHO TEMP -->
   <div class="section">
     <h3>📌 Itens para lançar</h3>
-    <div class="carrinho" id="carrinho"></div>
+    <div id="carrinho"></div>
     <div class="total">Total: R$ <span id="total">0.00</span></div>
     <button class="btn primary" onclick="lancarNaComanda()">Lançar na Comanda</button>
   </div>
 
 </main>
 
+<!-- MODAL DE CONFERÊNCIA E FECHAMENTO -->
 <div class="modal" id="modal">
   <div class="box">
-    <h3>🧾 Conferência</h3>
+    <h3>🧾 Conferência da Comanda</h3>
     <div id="modalItens"></div>
     <div class="total">Total: R$ <span id="modalTotal">0.00</span></div>
+
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
       <button class="btn gray" onclick="fecharModal()">Voltar</button>
       <button class="btn danger" onclick="mostrarPagamentos()">Fechar Conta</button>
     </div>
+
     <div id="pagamentos" style="display:none;margin-top:8px">
       <button class="btn gray" onclick="confirmarFechamento('PIX')">PIX</button>
       <button class="btn gray" onclick="confirmarFechamento('Crédito')">Crédito</button>
@@ -105,99 +91,176 @@ main{padding:12px;display:grid;gap:12px}
 </div>
 
 <script>
-const sb = window.supabase.createClient("https://jpbmilzeydcovghkrtfp.supabase.co","sb_publishable_H_F8x9-SerZW41cWUBdy6g_Ksb-XugW");
+const sb = window.supabase.createClient(
+  "https://jpbmilzeydcovghkrtfp.supabase.co",
+  "sb_publishable_H_F8x9-SerZW41cWUBdy6g_Ksb-XugW"
+);
 
-let produtos=[], comandas=[], comandaAtual=null;
-let carrinhoTemp=[], carrinhoPorComanda={};
+let produtos = [];
+let comandas = [];
+let comandaAtual = null;
+
+// Carrinho temporário (antes de lançar)
+let carrinhoTemp = [];
+
+// Itens já lançados por comanda (cache local só para visual)
+let cacheComandas = {};
 
 async function init(){
-  const { data:c } = await sb.from("comandas").select("id,nome").order("nome");
-  const { data:p } = await sb.from("produtos_turbo").select("id,nome,preco_venda").eq("ativo",true).order("nome");
-  comandas=c||[]; produtos=p||[];
-  renderComandas(); renderProdutos();
+  const { data: c } = await sb.from("comandas").select("id,nome,status").order("nome");
+  const { data: p } = await sb.from("produtos_turbo").select("id,nome,preco_venda").eq("ativo", true).order("nome");
+
+  comandas = c || [];
+  produtos = p || [];
+
+  renderComandas();
+  renderProdutos();
 }
 
 function renderComandas(){
-  document.getElementById("listaComandas").innerHTML = comandas.map(c=>{
-    const itens=carrinhoPorComanda[c.id]||[];
-    const total=itens.reduce((s,i)=>s+i.qtd*i.preco_venda,0);
-    return `<div class="comanda ${comandaAtual?.id===c.id?'active':''} ${total?'has-items':''}"
-      onclick="selecionarComanda('${c.id}')"
-      oncontextmenu="abrirModal('${c.id}');return false;">
-      ${c.nome}${total?`<div class="total">R$ ${total.toFixed(2)}</div>`:''}
-    </div>`;
+  document.getElementById("listaComandas").innerHTML = comandas.map(c => {
+    const total = (cacheComandas[c.id] || []).reduce((s,i)=> s + i.quantidade * i.preco_unitario, 0);
+    return `
+      <div class="comanda ${comandaAtual?.id === c.id ? 'active' : ''} ${total ? 'has-items' : ''}"
+           onclick="selecionarComanda('${c.id}')"
+           oncontextmenu="abrirModal('${c.id}'); return false;">
+        ${c.nome}
+        ${total ? `<div style="font-size:12px;color:#22c55e">R$ ${total.toFixed(2)}</div>` : ``}
+      </div>
+    `;
   }).join("");
 }
 
 function renderProdutos(){
-  document.getElementById("produtos").innerHTML = produtos.map(p=>{
-    const item=carrinhoTemp.find(i=>i.id===p.id);
-    const qtd=item?item.qtd:0;
-    return `<div class="produto ${qtd?'selected':''}" onclick="addTemp('${p.id}')">
-      ${qtd?`<span class="badge">${qtd}</span>`:''}
-      <b>${p.nome}</b><div>R$ ${Number(p.preco_venda).toFixed(2)}</div>
-    </div>`;
+  document.getElementById("produtos").innerHTML = produtos.map(p => {
+    const item = carrinhoTemp.find(i => i.id === p.id);
+    const qtd = item ? item.qtd : 0;
+    return `
+      <div class="produto ${qtd ? 'selected' : ''}" onclick="addTemp('${p.id}')">
+        ${qtd ? `<span class="badge">${qtd}</span>` : ``}
+        <b>${p.nome}</b>
+        <div>R$ ${Number(p.preco_venda).toFixed(2)}</div>
+      </div>
+    `;
   }).join("");
 }
 
 function renderCarrinho(){
-  let total=0;
-  document.getElementById("carrinho").innerHTML = carrinhoTemp.map((i,idx)=>{
-    const sub=i.qtd*i.preco_venda; total+=sub;
-    return `<div class="item">
-      <span>${i.nome}</span>
-      <div class="qty">
-        <button onclick="alt(${idx},-1)">-</button>
-        <b>${i.qtd}</b>
-        <button onclick="alt(${idx},1)">+</button>
+  let total = 0;
+  document.getElementById("carrinho").innerHTML = carrinhoTemp.map((i, idx) => {
+    const sub = i.qtd * i.preco_venda;
+    total += sub;
+    return `
+      <div class="item">
+        <span>${i.nome}</span>
+        <div class="qty">
+          <button onclick="alterarQtd(${idx}, -1)">-</button>
+          <b>${i.qtd}</b>
+          <button onclick="alterarQtd(${idx}, 1)">+</button>
+        </div>
+        <strong>R$ ${sub.toFixed(2)}</strong>
       </div>
-      <strong>R$ ${sub.toFixed(2)}</strong>
-    </div>`;
+    `;
   }).join("");
-  document.getElementById("total").innerText=total.toFixed(2);
+  document.getElementById("total").innerText = total.toFixed(2);
 }
 
-function selecionarComanda(id){ comandaAtual=comandas.find(c=>c.id===id); renderComandas(); }
-function addTemp(id){
-  if(!comandaAtual) return alert("Selecione uma comanda");
-  const p=produtos.find(x=>x.id===id);
-  const ex=carrinhoTemp.find(x=>x.id===id);
-  ex?ex.qtd++:carrinhoTemp.push({...p,qtd:1});
-  renderProdutos(); renderCarrinho();
-}
-function alt(i,d){ carrinhoTemp[i].qtd+=d; if(carrinhoTemp[i].qtd<=0)carrinhoTemp.splice(i,1); renderProdutos(); renderCarrinho(); }
-function lancarNaComanda(){
-  if(!comandaAtual) return alert("Selecione uma comanda");
-  carrinhoPorComanda[comandaAtual.id]=carrinhoPorComanda[comandaAtual.id]||[];
-  carrinhoTemp.forEach(it=>{
-    const ex=carrinhoPorComanda[comandaAtual.id].find(x=>x.id===it.id);
-    ex?ex.qtd+=it.qtd:carrinhoPorComanda[comandaAtual.id].push({...it});
-  });
-  carrinhoTemp=[]; renderProdutos(); renderCarrinho(); renderComandas();
+function selecionarComanda(id){
+  comandaAtual = comandas.find(c => c.id === id);
+  renderComandas();
 }
 
-function abrirModal(id){
-  comandaAtual=comandas.find(c=>c.id===id);
-  const itens=carrinhoPorComanda[id]||[];
-  let total=0;
-  document.getElementById("modalItens").innerHTML=itens.map(i=>{
-    const sub=i.qtd*i.preco_venda; total+=sub;
-    return `<div class="item"><span>${i.nome} x ${i.qtd}</span><strong>R$ ${sub.toFixed(2)}</strong></div>`;
+function addTemp(produtoId){
+  if(!comandaAtual) return alert("Selecione uma comanda primeiro.");
+  const p = produtos.find(x => x.id === produtoId);
+  const ex = carrinhoTemp.find(x => x.id === produtoId);
+  if(ex) ex.qtd++;
+  else carrinhoTemp.push({ ...p, qtd: 1 });
+  renderProdutos();
+  renderCarrinho();
+}
+
+function alterarQtd(idx, delta){
+  carrinhoTemp[idx].qtd += delta;
+  if(carrinhoTemp[idx].qtd <= 0) carrinhoTemp.splice(idx, 1);
+  renderProdutos();
+  renderCarrinho();
+}
+
+async function lancarNaComanda(){
+  if(!comandaAtual) return alert("Selecione uma comanda.");
+  if(!carrinhoTemp.length) return alert("Nenhum item selecionado.");
+
+  // Cria uma venda (lançamento)
+  const total = carrinhoTemp.reduce((s,i)=> s + i.qtd * i.preco_venda, 0);
+  const { data: venda, error } = await sb
+    .from("vendas")
+    .insert({ comanda_id: comandaAtual.id, total })
+    .select()
+    .single();
+
+  if(error){ alert("Erro ao criar venda: " + error.message); return; }
+
+  // Insere os itens da venda
+  const itens = carrinhoTemp.map(i => ({
+    venda_id: venda.id,
+    produto_id: i.id,
+    nome_produto: i.nome,
+    quantidade: i.qtd,
+    preco_unitario: i.preco_venda,
+    subtotal: i.qtd * i.preco_venda
+  }));
+
+  const { error: errItens } = await sb.from("vendas_itens").insert(itens);
+  if(errItens){ alert("Erro ao salvar itens: " + errItens.message); return; }
+
+  // Atualiza cache local para pintar a comanda
+  cacheComandas[comandaAtual.id] = (cacheComandas[comandaAtual.id] || []).concat(itens);
+
+  carrinhoTemp = [];
+  renderProdutos();
+  renderCarrinho();
+  renderComandas();
+  alert("Lançamento salvo com sucesso!");
+}
+
+async function abrirModal(id){
+  comandaAtual = comandas.find(c => c.id === id);
+
+  // Busca do banco TODOS os itens lançados nessa comanda
+  const { data } = await sb
+    .from("vendas_itens")
+    .select("nome_produto, quantidade, preco_unitario, subtotal, vendas!inner(comanda_id)")
+    .eq("vendas.comanda_id", id);
+
+  let total = 0;
+  document.getElementById("modalItens").innerHTML = (data || []).map(i => {
+    total += Number(i.subtotal);
+    return `<div class="item"><span>${i.nome_produto} x ${i.quantidade}</span><strong>R$ ${Number(i.subtotal).toFixed(2)}</strong></div>`;
   }).join("");
-  document.getElementById("modalTotal").innerText=total.toFixed(2);
+  document.getElementById("modalTotal").innerText = total.toFixed(2);
+
   document.getElementById("modal").classList.add("show");
 }
-function fecharModal(){ document.getElementById("modal").classList.remove("show"); document.getElementById("pagamentos").style.display="none"; }
-function mostrarPagamentos(){ document.getElementById("pagamentos").style.display="grid"; }
-async function confirmarFechamento(forma){
-  const itens=carrinhoPorComanda[comandaAtual.id]||[];
-  for(const item of itens){
-    await sb.from("vendas_bebidas").insert({produto_id:item.id,nome_produto:item.nome,quantidade:item.qtd,preco_unitario:item.preco_venda,total:item.qtd*item.preco_venda,forma_pagamento:forma,comanda_id:comandaAtual.id});
-  }
-  await sb.from("comandas").update({status:'FECHADA'}).eq("id",comandaAtual.id);
-  carrinhoPorComanda[comandaAtual.id]=[];
-  fecharModal(); renderComandas(); alert("Conta fechada!");
+
+function fecharModal(){
+  document.getElementById("modal").classList.remove("show");
+  document.getElementById("pagamentos").style.display = "none";
 }
+
+function mostrarPagamentos(){
+  document.getElementById("pagamentos").style.display = "block";
+}
+
+async function confirmarFechamento(forma){
+  // Atualiza forma de pagamento da última venda (ou você pode criar um fechamento agregado depois)
+  await sb.from("vendas").update({ forma_pagamento: forma }).eq("comanda_id", comandaAtual.id);
+  await sb.from("comandas").update({ status: "FECHADA", closed_at: new Date().toISOString() }).eq("id", comandaAtual.id);
+
+  fecharModal();
+  alert("Comanda fechada com sucesso!");
+}
+
 init();
 </script>
 
