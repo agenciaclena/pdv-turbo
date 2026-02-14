@@ -4,7 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#ff6a00" />
-<title>PDV Bebidas • Turbo Mobile</title>
+<title>PDV Bebidas • Turbo PWA</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -12,266 +16,139 @@
 
 <style>
 :root{
-  --primary:#ff6a00;
-  --dark:#0f172a;
-  --bg:#f4f6fb;
-  --card:#ffffff;
-  --border:#e5e7eb;
-  --muted:#64748b;
-  --radius:18px;
-  --shadow:0 10px 26px rgba(0,0,0,.12);
+  --primary:#ff6a00; --dark:#0f172a; --bg:#f4f6fb; --card:#fff;
+  --border:#e5e7eb; --muted:#64748b; --radius:18px; --shadow:0 10px 26px rgba(0,0,0,.12);
 }
 *{box-sizing:border-box;font-family:Inter,system-ui}
 body{margin:0;background:var(--bg);color:#0f172a}
-header{
-  position:sticky;top:0;z-index:20;
-  background:var(--dark);color:#fff;
-  padding:12px 14px;
-  display:flex;align-items:center;gap:8px;
-  font-weight:900
-}
+header{position:sticky;top:0;z-index:20;background:var(--dark);color:#fff;padding:12px 14px;font-weight:900}
 main{padding:12px;display:grid;gap:12px}
-.card{
-  background:var(--card);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  border:1px solid var(--border);
-  padding:12px
-}
-h2,h3{margin:0 0 8px 0}
-.search{display:flex;gap:8px;margin-bottom:8px}
-.search input{
-  width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);
-  font-size:16px
-}
-.lista{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px
-}
-.produto{
-  position:relative;
-  padding:12px;border-radius:16px;border:2px solid var(--border);
-  cursor:pointer;background:#fff;
-  transition:.12s;
-}
-.produto:active{transform:scale(.98)}
-.produto.selected{border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,106,0,.15)}
-.produto strong{display:block;font-size:13px;line-height:1.2}
-.preco{color:var(--primary);font-weight:900}
-.badge-qtd{
-  position:absolute;top:-8px;right:-8px;
-  background:var(--primary);color:#fff;
-  border-radius:999px;
-  padding:4px 8px;font-size:12px;font-weight:900;
-  box-shadow:0 4px 12px rgba(0,0,0,.25)
-}
-.estoque{
-  font-size:11px;color:var(--muted)
-}
-.carrinho{
-  display:flex;flex-direction:column;gap:6px;
-  max-height:240px;overflow:auto
-}
-.item{
-  display:grid;
-  grid-template-columns:1fr 70px 70px 26px;
-  gap:6px;align-items:center;
-  border-bottom:1px dashed var(--border);
-  padding-bottom:6px
-}
-.item input{
-  padding:6px;border-radius:8px;border:1px solid var(--border);
-  font-size:16px
-}
-.totalBox{
-  background:linear-gradient(135deg,#ff6a00,#f97316);
-  color:#fff;border-radius:14px;padding:12px;margin:8px 0;
-  font-size:22px;font-weight:900;text-align:center
-}
-.pay-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:8px
-}
-.pay-btn{
-  padding:14px;border-radius:14px;border:none;
-  font-weight:900;font-size:15px
-}
-.pay-btn.pix{background:#16a34a;color:#fff}
-.pay-btn.credit{background:#2563eb;color:#fff}
-.pay-btn.debit{background:#0ea5e9;color:#fff}
-.pay-btn.cash{background:#0f172a;color:#fff}
-.actions{
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px
-}
-.actions button{
-  padding:14px;border-radius:14px;border:none;font-weight:900
-}
-.actions .clear{background:#e5e7eb}
-.actions .confirm{background:#dc2626;color:#fff}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:12px}
+.lista{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.produto{position:relative;padding:12px;border-radius:16px;border:2px solid var(--border);background:#fff}
+.produto.selected{border-color:var(--primary)}
+.badge{position:absolute;top:-6px;right:-6px;background:var(--primary);color:#fff;border-radius:999px;padding:4px 8px;font-weight:900}
+.total{background:linear-gradient(135deg,#ff6a00,#f97316);color:#fff;border-radius:14px;padding:12px;text-align:center;font-size:22px;font-weight:900}
+.btn{padding:14px;border-radius:14px;border:none;font-weight:900}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.danger{background:#dc2626;color:#fff}
+.btn.gray{background:#e5e7eb}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 </style>
 </head>
 <body>
 
-<header>
-  <i class="ri-beer-line"></i> PDV Bebidas • Turbo Mobile
-</header>
+<header>PDV Bebidas • Turbo PWA</header>
 
 <main>
 
+  <!-- COMANDAS -->
+  <div class="card">
+    <h2>🧾 Comandas Abertas</h2>
+    <div id="listaComandas"></div>
+    <button class="btn primary" onclick="novaComanda()">+ Nova Comanda</button>
+  </div>
+
   <!-- PRODUTOS -->
   <div class="card">
-    <h2>🍻 Bebidas</h2>
-    <div class="search">
-      <input id="busca" placeholder="Buscar bebida..." oninput="filtrarProdutos()" />
-    </div>
+    <h2>🍻 Produtos</h2>
     <div class="lista" id="produtos"></div>
   </div>
 
-  <!-- CAIXA -->
+  <!-- COMANDA ATUAL -->
   <div class="card">
-    <h2>🧾 Caixa</h2>
-    <div class="carrinho" id="carrinho"></div>
-
-    <div class="totalBox">
-      TOTAL: R$ <span id="total">0.00</span>
-    </div>
+    <h2>📌 Comanda Atual</h2>
+    <div id="itensComanda"></div>
+    <div class="total">Total: R$ <span id="total">0.00</span></div>
 
     <h3>Forma de Pagamento</h3>
-    <div class="pay-grid">
-      <button class="pay-btn pix" onclick="selecionarPagamento('PIX')">PIX</button>
-      <button class="pay-btn credit" onclick="selecionarPagamento('Cartão Crédito')">Crédito</button>
-      <button class="pay-btn debit" onclick="selecionarPagamento('Cartão Débito')">Débito</button>
-      <button class="pay-btn cash" onclick="selecionarPagamento('Dinheiro')">Dinheiro</button>
+    <div class="grid2">
+      <button class="btn" onclick="selecionarPagamento('PIX')">PIX</button>
+      <button class="btn" onclick="selecionarPagamento('Cartão Crédito')">Crédito</button>
+      <button class="btn" onclick="selecionarPagamento('Cartão Débito')">Débito</button>
+      <button class="btn" onclick="selecionarPagamento('Dinheiro')">Dinheiro</button>
     </div>
 
-    <div class="actions">
-      <button class="clear" onclick="limpar()">Limpar</button>
-      <button class="confirm" onclick="confirmar()">Confirmar Venda</button>
+    <div class="grid2" style="margin-top:8px">
+      <button class="btn gray" onclick="limparComanda()">Limpar</button>
+      <button class="btn danger" onclick="finalizarComanda()">Fechar Conta</button>
     </div>
   </div>
 
 </main>
 
 <script>
-const sb = window.supabase.createClient(
-  "https://jpbmilzeydcovghkrtfp.supabase.co",
-  "sb_publishable_H_F8x9-SerZW41cWUBdy6g_Ksb-XugW"
-);
-
-let produtos = [];
-let carrinho = [];
-let formaSelecionada = null;
+const sb = window.supabase.createClient("https://jpbmilzeydcovghkrtfp.supabase.co","sb_publishable_H_F8x9-SerZW41cWUBdy6g_Ksb-XugW");
+let produtos=[], comandaAtual=null, carrinho=[], forma=null;
 
 async function carregarProdutos(){
-  const { data, error } = await sb
-    .from("produtos_turbo")
-    .select("id,nome,preco_venda,estoque")
-    .eq("ativo", true)
-    .order("nome");
-
-  if(error){ alert("Erro ao carregar produtos"); return; }
-
-  produtos = data || [];
-  renderProdutos(produtos);
+  const { data } = await sb.from("produtos_turbo").select("id,nome,preco_venda,estoque").eq("ativo",true).order("nome");
+  produtos = data||[]; renderProdutos();
 }
-
-function renderProdutos(lista){
-  document.getElementById("produtos").innerHTML = lista.map(p => {
-    const item = carrinho.find(x => x.id === p.id);
-    const qtd = item ? item.qtd : 0;
-    const disabled = p.estoque <= 0;
-
-    return `
-      <div class="produto ${qtd>0 ? 'selected':''}" 
-           onclick="${disabled ? '' : `add('${p.id}')`}" 
-           style="${disabled ? 'opacity:.5;pointer-events:none' : ''}">
-        ${qtd>0 ? `<span class="badge-qtd">${qtd}</span>` : ``}
-        <strong>${p.nome}</strong>
-        <span class="preco">R$ ${Number(p.preco_venda).toFixed(2)}</span>
-        <div class="estoque">Estoque: ${p.estoque}</div>
-      </div>
-    `;
+function renderProdutos(){
+  document.getElementById("produtos").innerHTML = produtos.map(p=>{
+    const item = carrinho.find(x=>x.id===p.id); const qtd=item?item.qtd:0;
+    return `<div class="produto ${qtd?'selected':''}" onclick="add('${p.id}')">
+      ${qtd?`<span class="badge">${qtd}</span>`:''}
+      <b>${p.nome}</b><div>R$ ${Number(p.preco_venda).toFixed(2)}</div>
+    </div>`;
   }).join("");
 }
-
-function filtrarProdutos(){
-  const t = document.getElementById("busca").value.toLowerCase();
-  renderProdutos(produtos.filter(p => p.nome.toLowerCase().includes(t)));
-}
-
 function add(id){
-  const p = produtos.find(x => x.id === id);
-  const ex = carrinho.find(x => x.id === id);
-  if(ex) ex.qtd++;
-  else carrinho.push({ ...p, qtd:1 });
-  renderCarrinho();
-  renderProdutos(produtos);
+  if(!comandaAtual) return alert("Abra uma comanda primeiro");
+  const p = produtos.find(x=>x.id===id);
+  const ex = carrinho.find(x=>x.id===id);
+  if(ex) ex.qtd++; else carrinho.push({...p,qtd:1});
+  renderProdutos(); renderCarrinho();
 }
-
 function renderCarrinho(){
-  let total = 0;
-  document.getElementById("carrinho").innerHTML = carrinho.map((i,idx)=>{
-    const sub = i.qtd * i.preco_venda;
-    total += sub;
-    return `
-      <div class="item">
-        <b>${i.nome}</b>
-        <input type="number" min="1" value="${i.qtd}" onchange="alt(${idx},this.value)">
-        <span>R$ ${sub.toFixed(2)}</span>
-        <i class="ri-close-circle-line" onclick="rem(${idx})"></i>
-      </div>
-    `;
+  let total=0;
+  document.getElementById("itensComanda").innerHTML = carrinho.map(i=>{
+    total+=i.qtd*i.preco_venda;
+    return `<div>${i.nome} x ${i.qtd} = R$ ${(i.qtd*i.preco_venda).toFixed(2)}</div>`;
   }).join("");
   document.getElementById("total").innerText = total.toFixed(2);
 }
 
-function alt(i,v){
-  carrinho[i].qtd = Math.max(1, Number(v)||1);
-  renderCarrinho();
-  renderProdutos(produtos);
+async function novaComanda(){
+  const nome = prompt("Nome/mesa da comanda:");
+  if(!nome) return;
+  const { data } = await sb.from("comandas").insert({ nome, status:'ABERTA' }).select().single();
+  comandaAtual = data; carrinho=[];
+  carregarComandas();
 }
-function rem(i){
-  carrinho.splice(i,1);
-  renderCarrinho();
-  renderProdutos(produtos);
+async function carregarComandas(){
+  const { data } = await sb.from("comandas").select("*").eq("status","ABERTA").order("created_at",{ascending:false});
+  document.getElementById("listaComandas").innerHTML = (data||[]).map(c=>`<button class="btn gray" onclick="abrirComanda('${c.id}')">${c.nome}</button>`).join(" ");
 }
-function limpar(){
-  carrinho=[]; formaSelecionada=null;
-  renderCarrinho();
-  renderProdutos(produtos);
+async function abrirComanda(id){
+  const { data } = await sb.from("comandas").select("*").eq("id",id).single();
+  comandaAtual = data; carrinho=[]; renderCarrinho();
 }
+function selecionarPagamento(f){ forma=f; alert("Pagamento: "+f); }
 
-function selecionarPagamento(forma){
-  formaSelecionada = forma;
-  alert("Pagamento selecionado: " + forma);
-}
-
-async function confirmar(){
-  if(!carrinho.length) return alert("Carrinho vazio");
-  if(!formaSelecionada) return alert("Escolha a forma de pagamento");
-
+async function finalizarComanda(){
+  if(!comandaAtual) return alert("Sem comanda");
+  if(!forma) return alert("Selecione a forma de pagamento");
   for(const item of carrinho){
-    const { error } = await sb.from("vendas_bebidas").insert({
-      produto_id: item.id,
-      nome_produto: item.nome,
-      quantidade: item.qtd,
-      preco_unitario: item.preco_venda,
-      total: item.qtd * item.preco_venda,
-      forma_pagamento: formaSelecionada
+    await sb.from("vendas_bebidas").insert({
+      produto_id:item.id,nome_produto:item.nome,quantidade:item.qtd,
+      preco_unitario:item.preco_venda,total:item.qtd*item.preco_venda,
+      forma_pagamento:forma, comanda_id: comandaAtual.id
     });
-    if(error){
-      alert("Erro ao salvar venda: " + error.message);
-      return;
-    }
   }
-
-  limpar();
-  carregarProdutos(); // atualiza estoque
-  alert("Venda registrada com sucesso!");
+  await sb.from("comandas").update({status:'FECHADA'}).eq("id",comandaAtual.id);
+  comandaAtual=null; carrinho=[]; forma=null;
+  carregarComandas(); carregarProdutos(); renderCarrinho();
+  alert("Conta finalizada!");
 }
 
-carregarProdutos();
-</script>
+carregarProdutos(); carregarComandas();
 
+// PWA
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
 </body>
 </html>
