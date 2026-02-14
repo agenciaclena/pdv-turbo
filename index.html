@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Turbo PDV</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0b1220">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f172a" />
+<title>PDV Garçom • Mobile</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -13,132 +12,166 @@
 
 <style>
 :root{
-  --primary:#2563eb;
-  --bg:#05070c;
-  --card:#0b1220;
-  --border:rgba(255,255,255,.08);
-  --text:#ffffff;
-  --muted:#94a3b8;
-  --danger:#dc2626;
-  --topbar-h:56px;
-  --navbar-h:68px;
+  --primary:#ff6a00;
+  --bg:#0f172a;
+  --card:#111827;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --radius:18px;
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter}
-html,body{width:100%;height:100%;background:var(--bg);color:var(--text);overflow:hidden}
-#loginWrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-.login-card{width:92%;max-width:420px;background:#0b1220;border:1px solid var(--border);border-radius:22px;padding:28px}
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
-.field label{font-size:12px;color:var(--muted)}
-.field input{background:#020617;border:1px solid var(--border);border-radius:12px;padding:12px;color:#fff}
-.btn{width:100%;padding:14px;border:none;border-radius:999px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-weight:900;cursor:pointer}
-.error{display:none;margin-top:10px;padding:10px;border-radius:12px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.4);color:#fecaca;font-size:12px}
 
-#appRoot{display:none;height:100%}
-.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);background:#020617;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:10}
-.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center;font-weight:900;cursor:pointer}
-.content{position:fixed;top:var(--topbar-h);bottom:var(--navbar-h);left:0;right:0;background:#020617}
-iframe{width:100%;height:100%;border:none}
-.navbar{position:fixed;bottom:0;left:0;right:0;height:var(--navbar-h);background:#020617;border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center}
-.nav-item{font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
-.nav-item.active{color:var(--primary)}
+*{box-sizing:border-box;font-family:Inter}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+.header{
+  padding:16px 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.header h2{margin:0;font-size:20px}
+
+.main{
+  flex:1;
+  overflow:auto;
+  padding:16px;
+  padding-bottom:90px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:16px;
+  box-shadow:0 10px 28px rgba(0,0,0,.4);
+}
+
+.hidden{display:none}
+
+.navbar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:74px;
+  background:#020617;
+  border-top:1px solid rgba(255,255,255,.08);
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  z-index:10;
+}
+
+.navbar button{
+  background:none;
+  border:none;
+  color:var(--muted);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  font-size:11px;
+  font-weight:600;
+}
+
+.navbar button i{
+  font-size:22px;
+}
+
+.navbar button.active{
+  color:#fff;
+}
+
+.navbar button.active i{
+  color:var(--primary);
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="loginWrap">
-  <div class="login-card">
-    <h1>Turbo PDV</h1>
-    <div class="field">
-      <label>Email</label>
-      <input id="email" type="email">
-    </div>
-    <div class="field">
-      <label>Senha</label>
-      <input id="senha" type="password">
-    </div>
-    <button class="btn" onclick="login()">Entrar</button>
-    <div id="erro" class="error"></div>
-  </div>
-</div>
+<header class="header">
+  <h2 id="titulo">Comandas</h2>
+  <span id="usuario" style="font-size:12px;opacity:.7"></span>
+</header>
 
-<div id="appRoot">
-  <div class="topbar">
-    <h1>TURBO PDV</h1>
-    <div class="avatar" id="avatar" onclick="logout()">A</div>
-  </div>
+<main class="main">
 
-  <div class="content">
-    <iframe id="frame-home" src="home.html"></iframe>
-    <iframe id="frame-caixa" src="pages/pdv.html" style="display:none"></iframe>
-    <iframe id="frame-produtos" src="pages/produtos.html" style="display:none"></iframe>
-    <iframe id="frame-relatorios" src="pages/relatorios.html" style="display:none"></iframe>
-  </div>
+  <section id="comandas" class="card">
+    🔧 Módulo de Comandas (próximo passo)
+  </section>
 
-  <nav class="navbar">
-    <div class="nav-item active" onclick="go(this,'home')"><i class="ri-home-5-line"></i>Home</div>
-    <div class="nav-item" onclick="go(this,'caixa')"><i class="ri-cash-line"></i>Caixa</div>
-    <div class="nav-item" onclick="go(this,'produtos')"><i class="ri-archive-line"></i>Produtos</div>
-    <div class="nav-item" onclick="go(this,'relatorios')"><i class="ri-bar-chart-2-line"></i>Relatórios</div>
-  </nav>
-</div>
+  <section id="contas" class="card hidden">
+    🔧 Módulo de Contas a pagar (depois)
+  </section>
+
+  <section id="investimentos" class="card hidden">
+    🔧 Módulo de Investimentos (depois)
+  </section>
+
+</main>
+
+<nav class="navbar">
+  <button class="active" onclick="showPage('comandas', this)">
+    <i class="ri-file-list-3-line"></i>
+    Comandas
+  </button>
+  <button onclick="showPage('contas', this)">
+    <i class="ri-bank-card-line"></i>
+    Contas
+  </button>
+  <button onclick="showPage('investimentos', this)">
+    <i class="ri-line-chart-line"></i>
+    Invest
+  </button>
+  <button onclick="logout()">
+    <i class="ri-logout-box-r-line"></i>
+    Sair
+  </button>
+</nav>
 
 <script>
-const sb = supabase.createClient(
-  "https://xysjlpsxgjwmhedkdgpd.supabase.co",
-  "sb_publishable_sjYPsNM9PBGvsvJTQEnz_w_k6SdvNHN"
+const supabase = window.supabase.createClient(
+  "https://jpbmilzeydcovghkrtfp.supabase.co",
+  "sb_publishable_H_F8x9-SerZW41cWUBdy6g_Ksb-XugW"
 );
 
-async function login(){
-  const email = document.getElementById("email").value.trim();
-  const senha = document.getElementById("senha").value.trim();
-  const erro = document.getElementById("erro");
-  erro.style.display="none";
-
-  const { data, error } = await sb
-    .from("usuarios_pdv")
-    .select("id,nome,email,role")
-    .eq("email", email)
-    .eq("senha", senha)
-    .eq("ativo", true)
-    .single();
-
-  if(error || !data){
-    erro.innerText = "Usuário ou senha inválidos";
-    erro.style.display = "block";
+async function loadUser(){
+  const { data } = await supabase.auth.getUser();
+  if(!data.user){
+    location.href = "login.html";
     return;
   }
+  document.getElementById("usuario").innerText = data.user.email;
+}
+loadUser();
 
-  localStorage.setItem("pdv_user", JSON.stringify(data));
-  abrirApp(data);
+function showPage(id, btn){
+  document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+
+  document.querySelectorAll(".navbar button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+
+  document.getElementById("titulo").innerText =
+    id === "comandas" ? "Comandas" :
+    id === "contas" ? "Contas a Pagar" :
+    "Investimentos";
 }
 
-function abrirApp(user){
-  document.getElementById("loginWrap").style.display="none";
-  document.getElementById("appRoot").style.display="block";
-  document.getElementById("avatar").innerText = (user.nome || "A")[0].toUpperCase();
+async function logout(){
+  await supabase.auth.signOut();
+  location.href = "login.html";
 }
-
-function go(el, key){
-  document.querySelectorAll(".nav-item").forEach(i=>i.classList.remove("active"));
-  el.classList.add("active");
-  ["home","caixa","produtos","relatorios"].forEach(k=>{
-    const f = document.getElementById("frame-"+k);
-    if(!f) return;
-    f.style.display = (k===key?"block":"none");
-  });
-}
-
-function logout(){
-  localStorage.removeItem("pdv_user");
-  location.reload();
-}
-
-// auto-login
-(function(){
-  const u = localStorage.getItem("pdv_user");
-  if(u) abrirApp(JSON.parse(u));
-})();
 </script>
 
 </body>
