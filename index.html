@@ -47,22 +47,35 @@ h2,h3{margin:0 0 8px 0}
 .lista{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:8px
+  gap:10px
 }
 .produto{
-  padding:12px;border-radius:14px;border:1px solid var(--border);
+  position:relative;
+  padding:12px;border-radius:16px;border:2px solid var(--border);
   cursor:pointer;background:#fff;
+  transition:.12s;
 }
-.produto:active{transform:scale(.98);border-color:var(--primary)}
+.produto:active{transform:scale(.98)}
+.produto.selected{border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,106,0,.15)}
 .produto strong{display:block;font-size:13px;line-height:1.2}
 .preco{color:var(--primary);font-weight:900}
+.badge-qtd{
+  position:absolute;top:-8px;right:-8px;
+  background:var(--primary);color:#fff;
+  border-radius:999px;
+  padding:4px 8px;font-size:12px;font-weight:900;
+  box-shadow:0 4px 12px rgba(0,0,0,.25)
+}
+.estoque{
+  font-size:11px;color:var(--muted)
+}
 .carrinho{
   display:flex;flex-direction:column;gap:6px;
   max-height:240px;overflow:auto
 }
 .item{
   display:grid;
-  grid-template-columns:1fr 60px 70px 26px;
+  grid-template-columns:1fr 70px 70px 26px;
   gap:6px;align-items:center;
   border-bottom:1px dashed var(--border);
   padding-bottom:6px
@@ -152,7 +165,7 @@ let formaSelecionada = null;
 async function carregarProdutos(){
   const { data, error } = await sb
     .from("produtos_turbo")
-    .select("id,nome,preco_venda")
+    .select("id,nome,preco_venda,estoque")
     .eq("ativo", true)
     .order("nome");
 
@@ -163,12 +176,22 @@ async function carregarProdutos(){
 }
 
 function renderProdutos(lista){
-  document.getElementById("produtos").innerHTML = lista.map(p => `
-    <div class="produto" onclick="add('${p.id}')">
-      <strong>${p.nome}</strong>
-      <span class="preco">R$ ${Number(p.preco_venda).toFixed(2)}</span>
-    </div>
-  `).join("");
+  document.getElementById("produtos").innerHTML = lista.map(p => {
+    const item = carrinho.find(x => x.id === p.id);
+    const qtd = item ? item.qtd : 0;
+    const disabled = p.estoque <= 0;
+
+    return `
+      <div class="produto ${qtd>0 ? 'selected':''}" 
+           onclick="${disabled ? '' : `add('${p.id}')`}" 
+           style="${disabled ? 'opacity:.5;pointer-events:none' : ''}">
+        ${qtd>0 ? `<span class="badge-qtd">${qtd}</span>` : ``}
+        <strong>${p.nome}</strong>
+        <span class="preco">R$ ${Number(p.preco_venda).toFixed(2)}</span>
+        <div class="estoque">Estoque: ${p.estoque}</div>
+      </div>
+    `;
+  }).join("");
 }
 
 function filtrarProdutos(){
@@ -182,6 +205,7 @@ function add(id){
   if(ex) ex.qtd++;
   else carrinho.push({ ...p, qtd:1 });
   renderCarrinho();
+  renderProdutos(produtos);
 }
 
 function renderCarrinho(){
@@ -201,9 +225,21 @@ function renderCarrinho(){
   document.getElementById("total").innerText = total.toFixed(2);
 }
 
-function alt(i,v){ carrinho[i].qtd = Number(v); renderCarrinho(); }
-function rem(i){ carrinho.splice(i,1); renderCarrinho(); }
-function limpar(){ carrinho=[]; formaSelecionada=null; renderCarrinho(); }
+function alt(i,v){
+  carrinho[i].qtd = Math.max(1, Number(v)||1);
+  renderCarrinho();
+  renderProdutos(produtos);
+}
+function rem(i){
+  carrinho.splice(i,1);
+  renderCarrinho();
+  renderProdutos(produtos);
+}
+function limpar(){
+  carrinho=[]; formaSelecionada=null;
+  renderCarrinho();
+  renderProdutos(produtos);
+}
 
 function selecionarPagamento(forma){
   formaSelecionada = forma;
@@ -224,12 +260,13 @@ async function confirmar(){
       forma_pagamento: formaSelecionada
     });
     if(error){
-      alert("Erro ao salvar venda");
+      alert("Erro ao salvar venda: " + error.message);
       return;
     }
   }
 
   limpar();
+  carregarProdutos(); // atualiza estoque
   alert("Venda registrada com sucesso!");
 }
 
