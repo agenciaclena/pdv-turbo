@@ -23,24 +23,35 @@ main{padding:12px;display:grid;gap:12px}
 .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:12px}
 .grid-comandas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .comanda{
-  padding:10px;border-radius:12px;border:2px solid var(--border);background:#fff;
-  font-weight:800; text-align:center; cursor:pointer;
+  padding:12px;border-radius:14px;border:2px solid var(--border);
+  text-align:center;font-weight:800;background:#fff;cursor:pointer;user-select:none
 }
-.comanda.active{border-color:var(--primary)}
+.comanda.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(255,106,0,.2)}
 .comanda.has-items{background:#ecfdf5;border-color:var(--green)}
-.comanda .total{font-size:12px;font-weight:900;color:#16a34a;margin-top:4px}
-.lista-produtos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.produto{position:relative;padding:12px;border-radius:16px;border:2px solid var(--border);background:#fff;cursor:pointer}
+.comanda .total{font-size:12px;color:#16a34a;margin-top:4px}
+
+.produtos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.produto{
+  position:relative;padding:12px;border-radius:14px;border:2px solid var(--border);
+  background:#fff;cursor:pointer
+}
 .produto.selected{border-color:var(--primary)}
 .badge{position:absolute;top:-6px;right:-6px;background:var(--primary);color:#fff;border-radius:999px;padding:4px 8px;font-weight:900}
+
+.carrinho{margin-top:6px}
+.item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{border:none;background:#e5e7eb;border-radius:8px;padding:6px 10px;font-weight:900}
+
 .total-box{background:linear-gradient(135deg,#ff6a00,#f97316);color:#fff;border-radius:14px;padding:12px;text-align:center;font-size:22px;font-weight:900}
 .btn{padding:14px;border-radius:14px;border:none;font-weight:900;cursor:pointer}
 .btn.primary{background:var(--primary);color:#fff}
 .btn.gray{background:#e5e7eb}
 .btn.danger{background:#dc2626;color:#fff}
-.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.item-comanda{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border)}
-.hidden{display:none}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;z-index:50}
+.modal .box{background:#fff;border-radius:18px 18px 0 0;padding:14px;max-height:85vh;overflow:auto}
+.modal.show{display:flex}
 </style>
 </head>
 <body>
@@ -49,43 +60,45 @@ main{padding:12px;display:grid;gap:12px}
 
 <main>
 
-  <!-- COMANDAS -->
   <div class="card">
     <h2>🧾 Comandas</h2>
     <div class="grid-comandas" id="listaComandas"></div>
   </div>
 
-  <!-- PRODUTOS -->
   <div class="card">
     <h2>🍻 Produtos</h2>
-    <div class="lista-produtos" id="produtos"></div>
+    <div class="produtos" id="produtos"></div>
   </div>
 
-  <!-- COMANDA ATUAL -->
   <div class="card">
-    <h2>📌 Comanda Atual <span id="nomeComanda"></span></h2>
-    <div id="itensComanda"></div>
+    <h2>📌 Itens para lançar</h2>
+    <div class="carrinho" id="carrinho"></div>
     <div class="total-box">Total: R$ <span id="total">0.00</span></div>
-
-    <button class="btn primary" onclick="abrirPagamento()">Finalizar</button>
-
-    <div id="pagamentoBox" class="hidden" style="margin-top:10px">
-      <h3>Forma de Pagamento</h3>
-      <div class="grid2">
-        <button class="btn gray" onclick="selecionarPagamento('PIX')">PIX</button>
-        <button class="btn gray" onclick="selecionarPagamento('Crédito')">Crédito</button>
-        <button class="btn gray" onclick="selecionarPagamento('Débito')">Débito</button>
-        <button class="btn gray" onclick="selecionarPagamento('Dinheiro')">Dinheiro</button>
-      </div>
-
-      <div class="grid2" style="margin-top:8px">
-        <button class="btn gray" onclick="fecharPagamento()">Cancelar</button>
-        <button class="btn danger" onclick="confirmarFechamento()">Confirmar Fechamento</button>
-      </div>
-    </div>
+    <button class="btn primary" onclick="lancarNaComanda()">Lançar itens na comanda</button>
   </div>
 
 </main>
+
+<!-- MODAL DE CONFERÊNCIA / FECHAMENTO -->
+<div class="modal" id="modal">
+  <div class="box">
+    <h3>🧾 Conferência da Comanda</h3>
+    <div id="modalItens"></div>
+    <div class="total-box">Total: R$ <span id="modalTotal">0.00</span></div>
+
+    <div style="margin-top:10px">
+      <button class="btn gray" onclick="fecharModal()">Voltar</button>
+      <button class="btn danger" onclick="mostrarPagamentos()">Fechar Conta</button>
+    </div>
+
+    <div id="pagamentos" style="display:none;margin-top:10px">
+      <button class="btn gray" onclick="confirmarFechamento('PIX')">PIX</button>
+      <button class="btn gray" onclick="confirmarFechamento('Crédito')">Crédito</button>
+      <button class="btn gray" onclick="confirmarFechamento('Débito')">Débito</button>
+      <button class="btn gray" onclick="confirmarFechamento('Dinheiro')">Dinheiro</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const sb = window.supabase.createClient(
@@ -93,152 +106,117 @@ const sb = window.supabase.createClient(
   "sb_publishable_H_F8x9-SerZW41cWUBdy6g_Ksb-XugW"
 );
 
-const TOTAL_COMANDAS = 20;
+let produtos=[], comandas=[], comandaAtual=null;
+let carrinhoTemp=[]; // itens selecionados antes de lançar
+let carrinhoPorComanda={};
 
-let produtos = [];
-let comandas = [];
-let carrinhoPorComanda = {}; // { comandaId: [{id,nome,preco_venda,qtd}] }
-let comandaAtual = null;
-let formaSelecionada = null;
-
-async function garantirComandas(){
-  const { data } = await sb.from("comandas").select("id,nome,status").order("nome");
-  comandas = data || [];
-
-  const existentes = new Set(comandas.map(c => c.nome));
-  const paraCriar = [];
-
-  for(let i=1;i<=TOTAL_COMANDAS;i++){
-    const nome = `Mesa ${i}`;
-    if(!existentes.has(nome)){
-      paraCriar.push({ nome, status:'ABERTA' });
-    }
-  }
-
-  if(paraCriar.length){
-    await sb.from("comandas").insert(paraCriar);
-    const { data: novos } = await sb.from("comandas").select("id,nome,status").order("nome");
-    comandas = novos || [];
-  }
-}
-
-async function carregarProdutos(){
-  const { data, error } = await sb
-    .from("produtos_turbo")
-    .select("id,nome,preco_venda")
-    .eq("ativo", true)
-    .order("nome");
-
-  if(error){ alert("Erro ao carregar produtos"); return; }
-  produtos = data || [];
-  renderProdutos();
+async function init(){
+  const { data: c } = await sb.from("comandas").select("id,nome,status").order("nome");
+  comandas = c || [];
+  const { data: p } = await sb.from("produtos_turbo").select("id,nome,preco_venda").eq("ativo",true).order("nome");
+  produtos = p || [];
+  renderComandas(); renderProdutos();
 }
 
 function renderComandas(){
   document.getElementById("listaComandas").innerHTML = comandas.map(c=>{
-    const itens = carrinhoPorComanda[c.id] || [];
-    const total = itens.reduce((s,i)=>s + i.qtd*i.preco_venda, 0);
+    const itens = carrinhoPorComanda[c.id]||[];
+    const total = itens.reduce((s,i)=>s+i.qtd*i.preco_venda,0);
     return `
-      <div class="comanda ${total>0 ? 'has-items':''} ${comandaAtual && comandaAtual.id===c.id ? 'active':''}"
-           onclick="selecionarComanda('${c.id}')">
+      <div class="comanda ${comandaAtual?.id===c.id?'active':''} ${total>0?'has-items':''}"
+           onclick="selecionarComanda('${c.id}')"
+           oncontextmenu="abrirModal('${c.id}');return false;">
         ${c.nome}
-        ${total>0 ? `<div class="total">R$ ${total.toFixed(2)}</div>` : ``}
-      </div>
-    `;
+        ${total>0?`<div class="total">R$ ${total.toFixed(2)}</div>`:''}
+      </div>`;
   }).join("");
 }
 
 function renderProdutos(){
   document.getElementById("produtos").innerHTML = produtos.map(p=>{
-    const itens = carrinhoPorComanda[comandaAtual?.id] || [];
-    const item = itens.find(x=>x.id===p.id);
-    const qtd = item ? item.qtd : 0;
+    const item = carrinhoTemp.find(i=>i.id===p.id);
+    const qtd = item?item.qtd:0;
     return `
-      <div class="produto ${qtd ? 'selected' : ''}" onclick="addItem('${p.id}')">
-        ${qtd ? `<span class="badge">${qtd}</span>` : ``}
+      <div class="produto ${qtd?'selected':''}" onclick="addTemp('${p.id}')">
+        ${qtd?`<span class="badge">${qtd}</span>`:''}
         <b>${p.nome}</b>
         <div>R$ ${Number(p.preco_venda).toFixed(2)}</div>
-      </div>
-    `;
+      </div>`;
   }).join("");
 }
 
 function renderCarrinho(){
-  const itens = carrinhoPorComanda[comandaAtual?.id] || [];
-  let total = 0;
-  document.getElementById("itensComanda").innerHTML = itens.map(i=>{
-    const sub = i.qtd * i.preco_venda;
-    total += sub;
-    return `<div class="item-comanda"><span>${i.nome} x ${i.qtd}</span><strong>R$ ${sub.toFixed(2)}</strong></div>`;
+  let total=0;
+  document.getElementById("carrinho").innerHTML = carrinhoTemp.map((i,idx)=>{
+    const sub=i.qtd*i.preco_venda; total+=sub;
+    return `
+      <div class="item">
+        <span>${i.nome}</span>
+        <div class="qty">
+          <button onclick="alterarQtd(${idx},-1)">-</button>
+          <b>${i.qtd}</b>
+          <button onclick="alterarQtd(${idx},1)">+</button>
+        </div>
+        <strong>R$ ${sub.toFixed(2)}</strong>
+      </div>`;
   }).join("");
   document.getElementById("total").innerText = total.toFixed(2);
-  renderComandas();
 }
 
-function selecionarComanda(id){
-  comandaAtual = comandas.find(c=>c.id===id);
-  renderProdutos();
-  renderCarrinho();
-}
-
-function addItem(produtoId){
+function selecionarComanda(id){ comandaAtual=comandas.find(c=>c.id===id); renderComandas(); }
+function addTemp(id){
   if(!comandaAtual) return alert("Selecione uma comanda");
-  const p = produtos.find(x=>x.id===produtoId);
+  const p = produtos.find(x=>x.id===id);
+  const ex = carrinhoTemp.find(x=>x.id===id);
+  if(ex) ex.qtd++; else carrinhoTemp.push({...p,qtd:1});
+  renderProdutos(); renderCarrinho();
+}
+function alterarQtd(i,delta){
+  carrinhoTemp[i].qtd+=delta;
+  if(carrinhoTemp[i].qtd<=0) carrinhoTemp.splice(i,1);
+  renderProdutos(); renderCarrinho();
+}
+function lancarNaComanda(){
+  if(!comandaAtual) return alert("Selecione a comanda");
   carrinhoPorComanda[comandaAtual.id] = carrinhoPorComanda[comandaAtual.id] || [];
-  const carrinho = carrinhoPorComanda[comandaAtual.id];
-  const ex = carrinho.find(x=>x.id===produtoId);
-  if(ex) ex.qtd++; else carrinho.push({...p, qtd:1});
-  renderProdutos();
-  renderCarrinho();
+  carrinhoTemp.forEach(it=>{
+    const ex = carrinhoPorComanda[comandaAtual.id].find(x=>x.id===it.id);
+    if(ex) ex.qtd += it.qtd;
+    else carrinhoPorComanda[comandaAtual.id].push({...it});
+  });
+  carrinhoTemp=[]; renderCarrinho(); renderProdutos(); renderComandas();
 }
 
-function abrirPagamento(){
-  if(!comandaAtual) return alert("Selecione uma comanda");
-  document.getElementById("pagamentoBox").classList.remove("hidden");
+function abrirModal(id){
+  comandaAtual = comandas.find(c=>c.id===id);
+  const itens = carrinhoPorComanda[id]||[];
+  let total=0;
+  document.getElementById("modalItens").innerHTML = itens.map(i=>{
+    const sub=i.qtd*i.preco_venda; total+=sub;
+    return `<div class="item"><span>${i.nome} x ${i.qtd}</span><strong>R$ ${sub.toFixed(2)}</strong></div>`;
+  }).join("");
+  document.getElementById("modalTotal").innerText = total.toFixed(2);
+  document.getElementById("modal").classList.add("show");
 }
-function fecharPagamento(){
-  document.getElementById("pagamentoBox").classList.add("hidden");
-  formaSelecionada = null;
-}
-function selecionarPagamento(f){
-  formaSelecionada = f;
-  alert("Pagamento: " + f);
-}
+function fecharModal(){ document.getElementById("modal").classList.remove("show"); document.getElementById("pagamentos").style.display='none'; }
+function mostrarPagamentos(){ document.getElementById("pagamentos").style.display='block'; }
 
-async function confirmarFechamento(){
-  if(!comandaAtual) return alert("Selecione uma comanda");
-  if(!formaSelecionada) return alert("Selecione a forma de pagamento");
-
-  const itens = carrinhoPorComanda[comandaAtual.id] || [];
-  if(!itens.length) return alert("Comanda vazia");
-
+async function confirmarFechamento(forma){
+  const itens = carrinhoPorComanda[comandaAtual.id]||[];
   for(const item of itens){
     await sb.from("vendas_bebidas").insert({
-      produto_id: item.id,
-      nome_produto: item.nome,
-      quantidade: item.qtd,
-      preco_unitario: item.preco_venda,
-      total: item.qtd * item.preco_venda,
-      forma_pagamento: formaSelecionada,
-      comanda_id: comandaAtual.id
+      produto_id:item.id,nome_produto:item.nome,quantidade:item.qtd,
+      preco_unitario:item.preco_venda,total:item.qtd*item.preco_venda,
+      forma_pagamento:forma, comanda_id:comandaAtual.id
     });
   }
-
-  await sb.from("comandas").update({ status:'FECHADA' }).eq("id", comandaAtual.id);
-
-  carrinhoPorComanda[comandaAtual.id] = [];
-  comandaAtual = null;
-  fecharPagamento();
-  renderProdutos();
-  renderCarrinho();
-  alert("Conta fechada com sucesso!");
+  await sb.from("comandas").update({status:'FECHADA'}).eq("id",comandaAtual.id);
+  carrinhoPorComanda[comandaAtual.id]=[];
+  fecharModal(); renderComandas();
+  alert("Conta fechada!");
 }
 
-(async function init(){
-  await garantirComandas();
-  await carregarProdutos();
-  renderComandas();
-})();
+init();
 </script>
 
 </body>
