@@ -4,11 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#ff6a00" />
-<title>PDV Bebidas • Turbo PWA</title>
-
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>PDV Bebidas • Turbo</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -35,11 +31,12 @@ main{padding:12px;display:grid;gap:12px}
 .btn.gray{background:#e5e7eb}
 .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .item-comanda{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border)}
+.search input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);font-size:16px}
 </style>
 </head>
 <body>
 
-<header>PDV Bebidas • Turbo PWA</header>
+<header>PDV Bebidas • Turbo</header>
 
 <main>
 
@@ -53,6 +50,9 @@ main{padding:12px;display:grid;gap:12px}
   <!-- PRODUTOS -->
   <div class="card">
     <h2>🍻 Produtos</h2>
+    <div class="search" style="margin-bottom:8px">
+      <input id="busca" placeholder="Buscar produto..." oninput="filtrarProdutos()" />
+    </div>
     <div class="lista" id="produtos"></div>
   </div>
 
@@ -85,6 +85,7 @@ const sb = window.supabase.createClient(
 );
 
 let produtos = [];
+let produtosFiltrados = [];
 let comandaAtual = null;
 let carrinho = [];
 let forma = null;
@@ -98,11 +99,12 @@ async function carregarProdutos(){
 
   if(error){ alert("Erro ao carregar produtos"); return; }
   produtos = data || [];
-  renderProdutos();
+  produtosFiltrados = produtos;
+  renderProdutos(produtosFiltrados);
 }
 
-function renderProdutos(){
-  document.getElementById("produtos").innerHTML = produtos.map(p=>{
+function renderProdutos(lista){
+  document.getElementById("produtos").innerHTML = lista.map(p=>{
     const item = carrinho.find(x=>x.id===p.id);
     const qtd = item ? item.qtd : 0;
     return `
@@ -115,19 +117,25 @@ function renderProdutos(){
   }).join("");
 }
 
+function filtrarProdutos(){
+  const t = document.getElementById("busca").value.toLowerCase();
+  produtosFiltrados = produtos.filter(p => p.nome.toLowerCase().includes(t));
+  renderProdutos(produtosFiltrados);
+}
+
 function add(id){
   if(!comandaAtual) return alert("Abra ou selecione uma comanda primeiro");
   const p = produtos.find(x=>x.id===id);
   const ex = carrinho.find(x=>x.id===id);
   if(ex) ex.qtd++;
   else carrinho.push({ ...p, qtd:1 });
-  renderProdutos();
+  renderProdutos(produtosFiltrados);
   renderCarrinho();
 }
 
 function renderCarrinho(){
   let total = 0;
-  document.getElementById("itensComanda").innerHTML = carrinho.map((i, idx)=>{
+  document.getElementById("itensComanda").innerHTML = carrinho.map((i)=>{
     const sub = i.qtd * i.preco_venda;
     total += sub;
     return `
@@ -164,7 +172,8 @@ async function carregarComandas(){
 }
 
 async function abrirComanda(id, nome){
-  const { data } = await sb.from("comandas").select("*").eq("id",id).single();
+  const { data, error } = await sb.from("comandas").select("*").eq("id",id).single();
+  if(error){ alert("Erro ao abrir comanda"); return; }
   comandaAtual = data;
   carrinho = [];
   document.getElementById("nomeComanda").innerText = `(${nome})`;
@@ -179,7 +188,7 @@ function selecionarPagamento(f){
 function limparComanda(){
   carrinho = [];
   renderCarrinho();
-  renderProdutos();
+  renderProdutos(produtosFiltrados);
 }
 
 async function finalizarComanda(){
@@ -216,10 +225,7 @@ async function finalizarComanda(){
 
 carregarProdutos();
 carregarComandas();
-
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('service-worker.js');
-}
 </script>
+
 </body>
 </html>
