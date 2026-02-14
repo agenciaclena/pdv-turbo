@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#ff6a00" />
-<title>PDV Bebidas • Mobile</title>
+<title>PDV Bebidas • Turbo Mobile</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -100,7 +100,7 @@ h2,h3{margin:0 0 8px 0}
 <body>
 
 <header>
-  <i class="ri-beer-line"></i> PDV Bebidas • Mobile
+  <i class="ri-beer-line"></i> PDV Bebidas • Turbo Mobile
 </header>
 
 <main>
@@ -140,7 +140,7 @@ h2,h3{margin:0 0 8px 0}
 </main>
 
 <script>
-const supabase = window.supabase.createClient(
+const sb = window.supabase.createClient(
   "https://jpbmilzeydcovghkrtfp.supabase.co",
   "sb_publishable_H_F8x9-SerZW41cWUBdy6g_Ksb-XugW"
 );
@@ -150,7 +150,7 @@ let carrinho = [];
 let formaSelecionada = null;
 
 async function carregarProdutos(){
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("produtos_turbo")
     .select("id,nome,preco_venda")
     .eq("ativo", true)
@@ -215,7 +215,7 @@ async function confirmar(){
   if(!formaSelecionada) return alert("Escolha a forma de pagamento");
 
   for(const item of carrinho){
-    const { error } = await supabase.from("vendas_bebidas").insert({
+    const { error } = await sb.from("vendas_bebidas").insert({
       produto_id: item.id,
       nome_produto: item.nome,
       quantidade: item.qtd,
