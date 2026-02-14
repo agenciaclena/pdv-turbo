@@ -188,14 +188,17 @@ function alterarQtd(idx, delta){
 }
 async function lancarNaComanda(){
   if(!comandaAtual) return alert("Selecione uma comanda.");
-  if(!carrinhoTemp.length) return alert("Nenhum item selecionado.");
+  if(!carrinho.length) return alert("Nenhum item selecionado.");
 
-  const total = carrinhoTemp.reduce((s,i)=> s + i.qtd * i.preco_venda, 0);
+  const total = carrinho.reduce((s,i)=> s + i.qtd * i.preco_venda, 0);
 
   // 1) cria venda
   const { data: venda, error: errVenda } = await sb
     .from("vendas")
-    .insert({ comanda_id: comandaAtual.id, total })
+    .insert({
+      comanda_id: comandaAtual.id,
+      total
+    })
     .select()
     .single();
 
@@ -206,8 +209,8 @@ async function lancarNaComanda(){
     return;
   }
 
-  // 2) cria itens
-  const itens = carrinhoTemp.map(i => ({
+  // 2) cria itens da venda
+  const itens = carrinho.map(i => ({
     venda_id: venda.id,
     produto_id: i.id,
     nome_produto: i.nome,
@@ -216,15 +219,18 @@ async function lancarNaComanda(){
     subtotal: i.qtd * i.preco_venda
   }));
 
+  console.log("ITENS A SALVAR:", itens);
+
   const { error: errItens } = await sb.from("vendas_itens").insert(itens);
-  console.log("ITENS:", errItens);
+
+  console.log("RESULTADO ITENS:", errItens);
 
   if(errItens){
     alert("Erro ao salvar itens: " + errItens.message);
     return;
   }
 
-  carrinhoTemp = [];
+  carrinho = [];
   renderProdutos();
   renderCarrinho();
   alert("Lançamento salvo com sucesso!");
