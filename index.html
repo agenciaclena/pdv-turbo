@@ -2,9 +2,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#ff6a00" />
-<title>PDV Bebidas • Premium</title>
+<title>PDV Bebidas • Mobile</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -18,65 +18,70 @@
   --card:#ffffff;
   --border:#e5e7eb;
   --muted:#64748b;
-  --radius:22px;
-  --shadow:0 14px 40px rgba(0,0,0,.12);
+  --radius:18px;
+  --shadow:0 10px 26px rgba(0,0,0,.12);
 }
 *{box-sizing:border-box;font-family:Inter,system-ui}
 body{margin:0;background:var(--bg);color:#0f172a}
 header{
-  position:sticky;top:0;z-index:10;
+  position:sticky;top:0;z-index:20;
   background:var(--dark);color:#fff;
-  padding:14px 18px;
-  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;
+  display:flex;align-items:center;gap:8px;
   font-weight:900
 }
-main{
-  max-width:1400px;margin:auto;padding:16px;
-  display:grid;grid-template-columns:1.4fr 1fr;gap:16px
-}
+main{padding:12px;display:grid;gap:12px}
 .card{
   background:var(--card);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
   border:1px solid var(--border);
-  padding:14px
+  padding:12px
 }
-h2{margin:0 0 10px 0}
-.search{
-  display:flex;gap:8px;margin-bottom:10px
-}
+h2,h3{margin:0 0 8px 0}
+.search{display:flex;gap:8px;margin-bottom:8px}
 .search input{
-  flex:1;padding:12px;border-radius:12px;border:1px solid var(--border)
+  width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);
+  font-size:16px
 }
 .lista{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-  gap:10px
+  grid-template-columns:repeat(2,1fr);
+  gap:8px
 }
 .produto{
   padding:12px;border-radius:14px;border:1px solid var(--border);
-  cursor:pointer;background:#fff;transition:.15s
+  cursor:pointer;background:#fff;
 }
-.produto:hover{transform:translateY(-3px);border-color:var(--primary)}
-.produto strong{display:block;font-size:13px}
+.produto:active{transform:scale(.98);border-color:var(--primary)}
+.produto strong{display:block;font-size:13px;line-height:1.2}
 .preco{color:var(--primary);font-weight:900}
-.carrinho{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
-.item{
-  display:grid;grid-template-columns:1fr 70px 90px 28px;gap:6px;align-items:center;
-  border-bottom:1px dashed var(--border);padding-bottom:6px
+.carrinho{
+  display:flex;flex-direction:column;gap:6px;
+  max-height:240px;overflow:auto
 }
-.item input{padding:6px;border-radius:8px;border:1px solid var(--border)}
+.item{
+  display:grid;
+  grid-template-columns:1fr 60px 70px 26px;
+  gap:6px;align-items:center;
+  border-bottom:1px dashed var(--border);
+  padding-bottom:6px
+}
+.item input{
+  padding:6px;border-radius:8px;border:1px solid var(--border);
+  font-size:16px
+}
 .totalBox{
   background:linear-gradient(135deg,#ff6a00,#f97316);
-  color:#fff;border-radius:16px;padding:14px;margin:10px 0;
-  font-size:26px;font-weight:900;text-align:center
+  color:#fff;border-radius:14px;padding:12px;margin:8px 0;
+  font-size:22px;font-weight:900;text-align:center
 }
 .pay-grid{
   display:grid;grid-template-columns:repeat(2,1fr);gap:8px
 }
 .pay-btn{
   padding:14px;border-radius:14px;border:none;
-  font-weight:900;cursor:pointer
+  font-weight:900;font-size:15px
 }
 .pay-btn.pix{background:#16a34a;color:#fff}
 .pay-btn.credit{background:#2563eb;color:#fff}
@@ -85,13 +90,17 @@ h2{margin:0 0 10px 0}
 .actions{
   display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px
 }
-button{cursor:pointer}
+.actions button{
+  padding:14px;border-radius:14px;border:none;font-weight:900
+}
+.actions .clear{background:#e5e7eb}
+.actions .confirm{background:#dc2626;color:#fff}
 </style>
 </head>
 <body>
 
 <header>
-  <i class="ri-beer-line"></i> PDV Bebidas • Premium
+  <i class="ri-beer-line"></i> PDV Bebidas • Mobile
 </header>
 
 <main>
@@ -108,7 +117,6 @@ button{cursor:pointer}
   <!-- CAIXA -->
   <div class="card">
     <h2>🧾 Caixa</h2>
-
     <div class="carrinho" id="carrinho"></div>
 
     <div class="totalBox">
@@ -117,15 +125,15 @@ button{cursor:pointer}
 
     <h3>Forma de Pagamento</h3>
     <div class="pay-grid">
-      <button class="pay-btn pix" onclick="finalizar('PIX')">PIX</button>
-      <button class="pay-btn credit" onclick="finalizar('Cartão Crédito')">Crédito</button>
-      <button class="pay-btn debit" onclick="finalizar('Cartão Débito')">Débito</button>
-      <button class="pay-btn cash" onclick="finalizar('Dinheiro')">Dinheiro</button>
+      <button class="pay-btn pix" onclick="selecionarPagamento('PIX')">PIX</button>
+      <button class="pay-btn credit" onclick="selecionarPagamento('Cartão Crédito')">Crédito</button>
+      <button class="pay-btn debit" onclick="selecionarPagamento('Cartão Débito')">Débito</button>
+      <button class="pay-btn cash" onclick="selecionarPagamento('Dinheiro')">Dinheiro</button>
     </div>
 
     <div class="actions">
-      <button onclick="limpar()" style="background:#e5e7eb;border:none;border-radius:12px;padding:12px">Limpar</button>
-      <button onclick="confirmar()" style="background:#dc2626;color:#fff;border:none;border-radius:12px;padding:12px">Confirmar Venda</button>
+      <button class="clear" onclick="limpar()">Limpar</button>
+      <button class="confirm" onclick="confirmar()">Confirmar Venda</button>
     </div>
   </div>
 
@@ -142,11 +150,14 @@ let carrinho = [];
 let formaSelecionada = null;
 
 async function carregarProdutos(){
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("produtos_turbo")
     .select("id,nome,preco_venda")
     .eq("ativo", true)
     .order("nome");
+
+  if(error){ alert("Erro ao carregar produtos"); return; }
+
   produtos = data || [];
   renderProdutos(produtos);
 }
@@ -183,7 +194,7 @@ function renderCarrinho(){
         <b>${i.nome}</b>
         <input type="number" min="1" value="${i.qtd}" onchange="alt(${idx},this.value)">
         <span>R$ ${sub.toFixed(2)}</span>
-        <i class="ri-close-circle-line" onclick="rem(${idx})" style="cursor:pointer"></i>
+        <i class="ri-close-circle-line" onclick="rem(${idx})"></i>
       </div>
     `;
   }).join("");
@@ -194,9 +205,9 @@ function alt(i,v){ carrinho[i].qtd = Number(v); renderCarrinho(); }
 function rem(i){ carrinho.splice(i,1); renderCarrinho(); }
 function limpar(){ carrinho=[]; formaSelecionada=null; renderCarrinho(); }
 
-function finalizar(forma){
+function selecionarPagamento(forma){
   formaSelecionada = forma;
-  alert("Forma selecionada: " + forma + "\nClique em CONFIRMAR VENDA");
+  alert("Pagamento selecionado: " + forma);
 }
 
 async function confirmar(){
@@ -204,7 +215,7 @@ async function confirmar(){
   if(!formaSelecionada) return alert("Escolha a forma de pagamento");
 
   for(const item of carrinho){
-    await supabase.from("vendas_bebidas").insert({
+    const { error } = await supabase.from("vendas_bebidas").insert({
       produto_id: item.id,
       nome_produto: item.nome,
       quantidade: item.qtd,
@@ -212,6 +223,10 @@ async function confirmar(){
       total: item.qtd * item.preco_venda,
       forma_pagamento: formaSelecionada
     });
+    if(error){
+      alert("Erro ao salvar venda");
+      return;
+    }
   }
 
   limpar();
